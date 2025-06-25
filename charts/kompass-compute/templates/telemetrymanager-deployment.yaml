@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.telemetryManager.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.telemetryManager.logLevel | lower }}
-            - -log-remote={{ default (.Values.logRemote | quote) (.Values.telemetryManager.logRemote | quote) }}
-            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.telemetryManager.traceRemote | quote) }}
+            - -log-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.telemetryManager.logRemote "default" .Values.logRemote) }}
+            - -trace-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.telemetryManager.traceRemote "default" .Values.traceRemote) }}
             {{- with .Values.telemetryManager.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
