@@ -1,0 +1,67 @@
+name: helm-lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: setup helm
+        uses: azure/setup-helm@v4
+
+      - name: install helm-docs
+        run: |
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${VERSION}/helm-docs_${VERSION}_Linux_x86_64.tar.gz
+          tar -xzf helm-docs_${VERSION}_Linux_x86_64.tar.gz
+          sudo mv helm-docs /usr/local/bin/
+        env:
+          VERSION: 1.14.2
+
+      - name: validate Chart.yaml version changed in PR
+        if: github.event_name == 'pull_request' && (github.event.pull_request.changed_files > 0)
+        run: |
+          CHART_PATHS=("charts/kompass-compute" "charts/kompass-compute-crd")
+          git fetch origin main
+      
+          for CHART_PATH in "${CHART_PATHS[@]}"; do
+            if git diff --name-only origin/main...HEAD | grep -q "^$CHART_PATH/"; then
+              MAIN_VERSION=$(git show origin/main:$CHART_PATH/Chart.yaml | yq '.version')
+              PR_VERSION=$(yq '.version' $CHART_PATH/Chart.yaml)
+      
+              echo "$CHART_PATH - Main version: $MAIN_VERSION"
+              echo "$CHART_PATH - PR version:   $PR_VERSION"
+      
+              if [ "$MAIN_VERSION" = "$PR_VERSION" ]; then
+                echo "❌ $CHART_PATH: Chart version has not been updated."
+                exit 1
+              fi
+      
+              if [ "$(printf '%s\n' "$PR_VERSION" "$MAIN_VERSION" | sort -V | head -n1)" = "$PR_VERSION" ]; then
+                echo "❌ $CHART_PATH: Chart version ($PR_VERSION) must be greater than main ($MAIN_VERSION)."
+                exit 1
+              fi
+      
+              echo "✅ $CHART_PATH: Chart version bump detected."
+            else
+              echo "No changes detected in $CHART_PATH, skipping version check."
+            fi
+          done
+
+      - name: run all checks
+        run: |
+          make all
+
+      - name: check for changes
+        run: |
+            git diff --exit-code || (echo "There are changes in the repository. Please commit them." && exit 1)
+            echo "No changes detected."
+        continue-on-error: true

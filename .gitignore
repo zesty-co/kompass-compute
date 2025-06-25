@@ -1,0 +1,9 @@
+# IDEs
+.idea/
+
+# Helm generated files
+charts/**/charts/
+charts/**/Chart.lock
+
+# Other
+.DS_Store
