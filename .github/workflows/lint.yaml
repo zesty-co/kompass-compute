@@ -20,9 +20,12 @@ jobs:
 
       - name: install helm-docs
         run: |
-          wget https://github.com/norwoodj/helm-docs/releases/download/v${VERSION}/helm-docs_${VERSION}_Linux_x86_64.tar.gz
-          tar -xzf helm-docs_${VERSION}_Linux_x86_64.tar.gz
-          sudo mv helm-docs /usr/local/bin/
+          mkdir -p helm-docs-tmp
+          wget https://github.com/norwoodj/helm-docs/releases/download/v${VERSION}/helm-docs_${VERSION}_Linux_x86_64.tar.gz -O helm-docs-tmp/helm-docs.tar.gz
+          tar -xzf helm-docs-tmp/helm-docs.tar.gz -C helm-docs-tmp
+          mkdir -p local/bin
+          mv helm-docs-tmp/helm-docs local/bin/
+          rm -rf helm-docs-tmp
         env:
           VERSION: 1.14.2
 
@@ -64,4 +67,3 @@ jobs:
         run: |
             git diff --exit-code || (echo "There are changes in the repository. Please commit them." && exit 1)
             echo "No changes detected."
-        continue-on-error: true
