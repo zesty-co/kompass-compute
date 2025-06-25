@@ -94,6 +94,25 @@ affinity:
 {{- end -}}
 
 {{/*
+defaultBool returns the default value if the given value is not boolean true/false.
+Otherwise, returns the given value.
+Usage: {{ include "kompass-compute.defaultBool" (dict "value" .Values.foo "default" true) }}
+*/}}
+{{- define "kompass-compute.defaultBool" -}}
+{{- $v := .value -}}
+{{- $d := .default -}}
+{{- if kindIs "bool" $v -}}
+  {{- $v -}}
+{{- else if eq (toString $v | lower) "true" -}}
+  true
+{{- else if eq (toString $v | lower) "false" -}}
+  false
+{{- else -}}
+  {{- $d -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Kompass Insight Secret name
 Component: General
 */}}

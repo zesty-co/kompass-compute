@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.hiberscaler.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.hiberscaler.logLevel | lower }}
-            - -log-remote={{ default (.Values.logRemote | quote) (.Values.hiberscaler.logRemote | quote) }}
-            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.hiberscaler.traceRemote | quote) }}
+            - -log-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.hiberscaler.logRemote "default" .Values.logRemote) }}
+            - -trace-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.hiberscaler.traceRemote "default" .Values.traceRemote) }}
             {{- with .Values.hiberscaler.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

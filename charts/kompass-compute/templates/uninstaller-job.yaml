@@ -45,8 +45,8 @@ spec:
           imagePullPolicy: {{ .Values.uninstaller.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.uninstaller.logLevel | lower }}
-            - -log-remote={{ default (.Values.logRemote | quote) (.Values.uninstaller.logRemote | quote) }}
-            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.uninstaller.traceRemote | quote) }}
+            - -log-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.uninstaller.logRemote "default" .Values.logRemote) }}
+            - -trace-remote={{ include "kompass-compute.defaultBool" (dict "value" .Values.uninstaller.traceRemote "default" .Values.traceRemote) }}
             {{- with .Values.uninstaller.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
