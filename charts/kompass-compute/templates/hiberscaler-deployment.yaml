@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.hiberscaler.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.hiberscaler.logLevel | lower }}
-            - -log-remote={{ default .Values.logRemote .Values.hiberscaler.logRemote }}
-            - -trace-remote={{ default .Values.traceRemote .Values.hiberscaler.traceRemote }}
+            - -log-remote={{ default (.Values.logRemote | quote) (.Values.hiberscaler.logRemote | quote) }}
+            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.hiberscaler.traceRemote | quote) }}
             {{- with .Values.hiberscaler.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

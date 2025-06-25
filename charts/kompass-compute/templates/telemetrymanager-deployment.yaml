@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.telemetryManager.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.telemetryManager.logLevel | lower }}
-            - -log-remote={{ default .Values.logRemote .Values.telemetryManager.logRemote }}
-            - -trace-remote={{ default .Values.traceRemote .Values.telemetryManager.traceRemote }}
+            - -log-remote={{ default (.Values.logRemote | quote) (.Values.telemetryManager.logRemote | quote) }}
+            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.telemetryManager.traceRemote | quote) }}
             {{- with .Values.telemetryManager.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

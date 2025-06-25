@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.cache.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.cache.logLevel | lower }}
-            - -log-remote={{ default .Values.logRemote .Values.cache.logRemote }}
-            - -trace-remote={{ default .Values.traceRemote .Values.cache.traceRemote }}
+            - -log-remote={{ default (.Values.logRemote | quote) (.Values.cache.logRemote | quote) }}
+            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.cache.traceRemote | quote) }}
             {{- with .Values.cache.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

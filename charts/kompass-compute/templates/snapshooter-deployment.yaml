@@ -42,8 +42,8 @@ spec:
           imagePullPolicy: {{ .Values.snapshooter.image.pullPolicy }}
           args:
             - -zap-log-level={{ default .Values.logLevel .Values.snapshooter.logLevel | lower }}
-            - -log-remote={{ default .Values.logRemote .Values.snapshooter.logRemote }}
-            - -trace-remote={{ default .Values.traceRemote .Values.snapshooter.traceRemote }}
+            - -log-remote={{ default (.Values.logRemote | quote) (.Values.snapshooter.logRemote | quote) }}
+            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.snapshooter.traceRemote | quote) }}
             {{- with .Values.snapshooter.extraArgs }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

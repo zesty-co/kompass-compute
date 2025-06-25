@@ -19,13 +19,13 @@ tag: ~
 # Valid levels: "debug", "info", "warn", "error".
 logLevel: "info"
 # Global setting to enable/disable remote logging for all components. Can be overridden per component.
-logRemote: "true"
+logRemote: true
 # Global setting to enable/disable remote tracing for all components. Can be overridden per component.
-traceRemote: "true"
+traceRemote: true
 # Global setting to enable/disable remote monitoring for all components. Can be overridden per component.
-monitorRemote: "true"
+monitorRemote: true
 # Global setting for development mode features for all components. Can be overridden per component.
-developmentMode: "false"
+developmentMode: false
 # Name of the Kubernetes secret created by the Kompass Insight.
 kompassInsightSecret: "kompass-insights-secret"
 
