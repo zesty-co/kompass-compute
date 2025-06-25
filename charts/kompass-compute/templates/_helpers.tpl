@@ -876,7 +876,7 @@ Component: QubexConfig
 */}}
 {{- define "kompass-compute.qubexConfig.config" -}}
 {{- $defaultConfig := dict
-"nodeAgentHTTPAddressPrefix" (printf "https://qubex-assets.s3.eu-west-3.amazonaws.com/%s" (include "kompass-compute.hiberscaler.imageTag" .))
+"nodeAgentHTTPAddressPrefix" (printf "https://kompass-compute.s3.eu-west-1.amazonaws.com/%s" (include "kompass-compute.hiberscaler.imageTag" .))
 "cacheConfig" (dict
     "imageSizeCalculatorConfig" (dict
         "image" (include "kompass-compute.imageSizeCalculator.image" .)

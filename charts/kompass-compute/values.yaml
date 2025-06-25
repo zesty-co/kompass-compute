@@ -837,7 +837,7 @@ qubexConfig:
   # Path to NodeAgent HTTP address prefix
   # The S3 bucket from which the QNode will download the Qubex assets
   # Override the node agent HTTP address prefix if you want to use a custom one.
-  # Default is https://qubex-assets.s3.eu-west-3.amazonaws.com/<HIBERSCALER_TAG>
+  # Default is https://kompass-compute.s3.eu-west-1.amazonaws.com/<HIBERSCALER_TAG>
   # nodeAgentHTTPAddressPrefix: ...
 
   # List of supported architectures
