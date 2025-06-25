@@ -1,0 +1,92 @@
+{{- $root := . }}
+{{- range $i, $_ := .Values.cachePullMappings.dockerhub }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-dockerhub-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  additionalAliases:
+    - docker.io
+    - index.docker.io
+  originalHost: registry-1.docker.io
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: PublicDefault
+{{- end }}
+{{- range $i, $_ := .Values.cachePullMappings.ecr }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-ecr-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  originalHost: public.ecr.aws
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: Public
+{{- end }}
+{{- range $i, $_ := .Values.cachePullMappings.ghcr }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-ghcr-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  originalHost: ghcr.io
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: Public
+{{- end }}
+{{- range $i, $_ := .Values.cachePullMappings.k8s }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-k8s-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  originalHost: registry.k8s.io
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: Public
+{{- end }}
+{{- range $i, $_ := .Values.cachePullMappings.quay }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-quay-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  originalHost: quay.io
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: Public
+{{- end }}
+{{- range $i, $_ := .Values.cachePullMappings.custom }}
+---
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QCachePullMapping
+metadata:
+  name: {{ include "kompass-compute.cachePullMapping.name" $root }}-custom-{{ $i }}
+  labels:
+    {{- include "kompass-compute.cachePullMapping.labels" $root | nindent 4 }}
+spec:
+  originalHost: {{ .originalHost | quote }}
+  {{- with .additionalAliases }}
+  additionalAliases:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  proxyAddress: {{ .proxyAddress | quote }}
+  pullSecret: {{ default "" .pullSecret | quote }}
+  type: {{ default "Public" .type | quote }}
+{{- end }}

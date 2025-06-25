@@ -1,0 +1,112 @@
+{{- if .Values.telemetryManager.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kompass-compute.telemetryManager.name" . }}
+  labels:
+    {{- include "kompass-compute.telemetryManager.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.telemetryManager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.telemetryManager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- include "kompass-compute.annotations.qubexConfigChecksum" . | nindent 8 }}
+        {{- with .Values.telemetryManager.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kompass-compute.telemetryManager.labels" . | nindent 8 }}
+        {{- with .Values.telemetryManager.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.telemetryManager.serviceAccountName" . }}
+      {{- with .Values.telemetryManager.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: telemetry-manager
+          {{- with .Values.telemetryManager.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.telemetryManager.image" . | quote }}
+          imagePullPolicy: {{ .Values.telemetryManager.image.pullPolicy }}
+          args:
+            - -zap-log-level={{ default .Values.logLevel .Values.telemetryManager.logLevel | lower }}
+            - -log-remote={{ default .Values.logRemote .Values.telemetryManager.logRemote }}
+            - -trace-remote={{ default .Values.traceRemote .Values.telemetryManager.traceRemote }}
+            {{- with .Values.telemetryManager.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.telemetryManager.developmentMode | quote }}
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- with .Values.telemetryManager.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.telemetryManager.ports }}
+          ports:
+            {{- range $name, $port := . }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol | default "TCP" }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.telemetryManager.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.telemetryManager.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.telemetryManager.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.telemetryManager.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+            {{- with .Values.telemetryManager.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        {{- with .Values.telemetryManager.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.telemetryManager.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.telemetryManager.affinity" . | nindent 6 }}
+      {{- with .Values.telemetryManager.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

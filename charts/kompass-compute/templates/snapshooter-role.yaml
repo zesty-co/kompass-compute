@@ -1,0 +1,28 @@
+{{- if and .Values.snapshooter.enabled .Values.snapshooter.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "kompass-compute.snapshooter.name" . }}
+  labels:
+    {{- include "kompass-compute.snapshooter.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - "leases"
+    verbs:
+      - "get"
+      - "watch"
+      - "create"
+      - "update"
+      - "patch"
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - "list"
+      - "watch"
+      - "create"
+      - "patch"
+{{- end }}

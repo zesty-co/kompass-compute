@@ -1,0 +1,115 @@
+{{- if and .Values.cache.enabled .Values.cache.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kompass-compute.cache.name" . }}
+  labels:
+    {{- include "kompass-compute.cache.labels" . | nindent 4 }}
+rules:
+  # observe current QubexConfig object
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qubexconfigs"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qcacherevisioncreations"
+      - "qcacheshards"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "create"
+      - "update"
+      - "patch"
+      - "delete"
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qcacherevisioncreations/status"
+      - "qcacheshards/status"
+    verbs:
+      - "update"
+      - "patch"
+  # list QNodes to check which one are using given shared
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qnodes"
+    verbs:
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "kompass.zesty.co"
+    resources:
+      - "workloaddescriptors"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # required by controller cache
+  - apiGroups:
+      - ""
+    resources:
+      - "namespaces"
+    verbs:
+      - "list"
+      - "watch"
+  # list pull secrets, watch is required by controller cache
+  - apiGroups:
+      - ""
+    resources:
+      - "secrets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # list pods to read images, watch is required by controller cache
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "list"
+      - "watch"
+  # Manage workloads
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+      - "statefulsets"
+      - "replicasets"
+      - "daemonsets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Create Image Size Calculator jobs
+  - apiGroups:
+      - "batch"
+    resources:
+      - "jobs"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "create"
+      - "update"
+      - "patch"
+      - "delete"
+  # Create custom events
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - "list"
+      - "watch"
+      - "create"
+      - "patch"
+{{- end }}

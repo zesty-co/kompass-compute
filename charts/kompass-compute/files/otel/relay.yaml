@@ -1,0 +1,139 @@
+# Configuration based on:
+# - https://coralogix.com/docs/opentelemetry/integrations/kubernetes-complete-observability-advanced-configuration
+# - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/exporter/coralogixexporter
+# - https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main
+# - https://github.com/open-telemetry/opentelemetry-collector/tree/main
+# - https://aws-otel.github.io/
+# - https://docs.aws.amazon.com/prometheus/latest/userguide/AMP-onboard-ingest-metrics-OpenTelemetry.html
+# - https://coralogix.com/docs/integrations/coralogix-endpoints/
+
+exporters:
+  debug:
+  #  verbosity: detailed
+
+  coralogix:
+    timeout: "30s"
+    domain: "${env:CORALOGIX_DOMAIN}"
+    private_key: "${env:CORALOGIX_API_KEY}"
+    subsystem_name_attributes:
+      - "subsystem.name"
+    application_name: "zesty-k8s-scaler"
+
+extensions:
+  health_check:
+    endpoint: ${env:MY_POD_IP}:13133
+
+processors:
+  batch:
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+    timeout: "1s"
+
+  memory_limiter:
+    # Collector will start GC (and drop data when GC not improve the situation) when memory reaches: <memory_limit> * (<limit_percentage> - <spike_limit_percentage>) / 100
+    # With 512MiB memory limit, the process will start at 512MiB * (80% - 25%) / 100 = 281MiB
+    # With 256MiB memory request and HPA set to 80%, the scaling will start at 256MiB * 80% = 204MiB
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 25
+
+  # Details: https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor
+  # Language and syntax: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/README.md
+  # Disable prometheus internal metrics
+  filter/prometheus_internal:
+    error_mode: ignore
+    metrics:
+      metric:
+        - 'name == "scrape_duration_seconds"'
+        - 'name == "scrape_samples_post_metric_relabeling"'
+        - 'name == "scrape_samples_scraped"'
+        - 'name == "scrape_series_added"'
+
+  transform/remove_host:
+    error_mode: ignore
+    metric_statements:
+      - context: resource
+        statements:
+          - delete_key(attributes, "k8s.node.name")
+          - delete_key(attributes, "net.host.name")
+          - delete_key(attributes, "service.instance.id")
+
+  transform/remove_k8s:
+    error_mode: ignore
+    metric_statements:
+      - context: resource
+        statements:
+          - delete_key(attributes, "k8s.container.name")
+          - delete_key(attributes, "k8s.namespace.name")
+          # Keeping these attributes because they are needed to differentiate golang internal metrics between pods
+          # as well as coralogix having lower metrics pricing (0.05$/GB)
+          # - delete_key(attributes, "k8s.replicaset.name")
+          # - delete_key(attributes, "k8s.pod.name")
+
+  # Append cluster name to service name so that the Coralogix subsystem name includes the cluster name
+  # This is needed because Coralogix only allows to do cost breakdowns using the subsystem name,
+  # so we need it to be able to get costs per cluster.
+  transform/add_suffix:
+    error_mode: ignore
+    metric_statements:
+      - context: resource
+        statements:
+          - set(attributes["subsystem.name"], Concat([attributes["service.name"], "${env:CLUSTER_NAME}"], "-"))
+
+  attributes/cluster:
+    actions:
+      - key: data.cluster_id
+        value: ${env:CLUSTER_ID}
+        action: insert
+      - key: data.cluster_name
+        value: ${env:CLUSTER_NAME}
+        action: insert
+      - key: data.org_id
+        value: ${env:ORG_ID}
+        action: insert
+      - key: data.development_mode
+        value: ${env:DEVELOPMENT_MODE}
+        action: insert
+
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: ${env:MY_POD_IP}:4317
+      http:
+        endpoint: ${env:MY_POD_IP}:4318
+
+  prometheus:
+    config: ${file:/conf/prometheus.yaml}
+
+service:
+  extensions:
+    - health_check
+
+  telemetry:
+    logs:
+      level: info
+      encoding: json
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: '${env:MY_POD_IP}'
+                port: 8888
+
+  pipelines:
+    metrics:
+      exporters:
+        - ${env:METRICS_EXPORTER}
+      processors:
+        - memory_limiter
+        - filter/prometheus_internal
+        - transform/remove_host
+        - transform/remove_k8s
+        - transform/add_suffix
+        - attributes/cluster
+        - batch
+      receivers:
+        - prometheus

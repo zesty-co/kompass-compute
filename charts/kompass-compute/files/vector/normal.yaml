@@ -1,0 +1,127 @@
+# https://coralogix.com/docs/integrations/files/vector/#support
+
+data_dir: /vector-data-dir
+sources:
+  journal:
+    type: journald
+    include_matches:
+      # Replacement for /dev/kmsg
+      "_TRANSPORT":
+        - kernel
+    include_units:
+      - kubelet
+      - containerd
+      - docker
+  # We ignore these logs because they require this pod to have privileged permission
+  # which is not worth the value that these logs bring
+  # files:
+  #   type: file
+  #   include:
+  #     - /var/log/cloud-init-output.log
+  aws-node-pod:
+    type: kubernetes_logs
+    extra_label_selector: "k8s-app=aws-node"
+  kube-proxy-pod:
+    type: kubernetes_logs
+    extra_label_selector: "k8s-app=kube-proxy"
+  qubex-opentelemetry-collector-pod:
+    type: kubernetes_logs
+    extra_label_selector: "app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{include "kompass-compute.otel.shortName" . }}"
+transforms:
+  # aws_metadata is disabled because certain ec2 metadata configurations
+  # prevent pods from accessing IMDS, specificly having hop count of 0 or 1.
+  # in such cases it causes the pod to loop crash.
+  # aws_metadata:
+  #   type: aws_ec2_metadata
+  modify:
+    type: remap
+    inputs:
+      - journal
+      - aws-node-pod
+      - kube-proxy-pod
+      - qubex-opentelemetry-collector-pod
+    source: |
+      # Unified field names
+      .data.cluster_id = "${CLUSTER_ID:?cluster id must be supplied}"
+      .data.cluster_name = "${CLUSTER_NAME:?cluster name must be supplied}"
+      .data.org_id = "${ORG_ID:?org id must be supplied}"
+      .data.account_id = "${ACCOUNT_ID:?account id must be supplied}"
+      .data.development_mode = "${DEVELOPMENT_MODE:?development mode must be supplied}"
+      # Does work because of the aws_metadata described above.
+      # We might get it by routing the logs to otel instead of Coralogix and enriching the logs there
+      # .infraID = ."instance-id"
+      .data.node.name = "${VECTOR_SELF_NODE_NAME:?VECTOR_SELF_NODE_NAME must be supplied}"
+      .data.host = "${VECTOR_SELF_NODE_NAME:?VECTOR_SELF_NODE_NAME must be supplied}"
+      .data.service = "vector-node"
+      .data.logger = "UNDEFINED"
+
+      if (._TRANSPORT == "kernel") {
+        .data.logger = "Kernel"
+      } else if (._SYSTEMD_UNIT == "kubelet.service") {
+        . |= parse_klog(string!(.message)) ?? {}
+        .klog_file = .file
+        del(.file)
+        .data.logger = "Kubelet"
+      } else if (._SYSTEMD_UNIT == "containerd.service") {
+        . |= parse_logfmt(string!(.message)) ?? {}
+        .message = .msg
+        del(.msg)
+        .timestamp = .time
+        .data.logger = "Containerd"
+      } else if (._SYSTEMD_UNIT == "docker.service") {
+        . |= parse_logfmt(string!(.message)) ?? {}
+        .data.logger = "Docker"
+      } else if (.source_type == "kubernetes_logs") {
+        pod_name, err = to_string(.kubernetes.pod_name)
+        if err == null {
+          if (match(pod_name, r'aws-node.*$')) {
+            .data.logger = "AWSNode"
+          } else if (match(pod_name, r'kube-proxy.*$')) {
+            .data.logger = "KubeProxy"
+          } else if (match(pod_name, r'qubex-opentelemetry-collector.*$')) {
+            .data.logger = "QubexOpenTelemetryCollector"
+          }
+        } else {
+          .data.logger = "UNDEFINED_KUBERNETES"
+        }
+      }
+  prepare_for_coralogix:
+    type: remap
+    inputs:
+      - modify
+    source: |
+      t = parse_timestamp(.timestamp, "%+") ?? now()
+      del(.timestamp)
+      . = {
+        "applicationName": "zesty-k8s-scaler",
+        "subsystemName": "vector-node",
+        "json": .,
+        "computerName": .host,
+        "timestamp": to_unix_timestamp(t, unit: "milliseconds"),
+      }
+sinks:
+# Print parsed logs to stdout
+#  print:
+#    type: "console"
+#    inputs:
+#      - modify
+#    encoding:
+#      codec: "json"
+  coralogix:
+    type: http
+    inputs:
+      - prepare_for_coralogix
+    compression: none
+    uri: ${CORALOGIX_INGRESS_LOGS_URL:?coralogix ingress url must be supplied}
+    batch:
+      maxbytes:
+        1049000
+      timeout_secs:
+        2
+    encoding:
+      codec:
+        json
+    request:
+      headers:
+        Content-Type: application/json
+        authorization: "Bearer ${CORALOGIX_API_KEY:?coralogix api key must be supplied}"

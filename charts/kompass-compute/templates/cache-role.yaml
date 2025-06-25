@@ -1,0 +1,19 @@
+{{- if and .Values.cache.enabled .Values.cache.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "kompass-compute.cache.name" . }}
+  labels:
+    {{- include "kompass-compute.cache.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - "leases"
+    verbs:
+      - "get"
+      - "watch"
+      - "create"
+      - "update"
+      - "patch"
+{{- end }}

@@ -1,0 +1,88 @@
+scrape_configs:
+  # Default scraping interval (1m)
+  - job_name: 'kubelet-cadvisor'
+    kubernetes_sd_configs:
+      - role: node
+    metrics_path: /metrics
+    scheme: https
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      insecure_skip_verify: true
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_node_name]
+        target_label: node
+      - regex: (.*)
+        target_label: __metrics_path__
+        replacement: /metrics/cadvisor
+        action: replace
+      - source_labels: [__address__]
+        regex: (.+)
+        target_label: __param_target
+        replacement: $${1}
+      - source_labels: [__address__]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $$1:10250
+        target_label: __address__
+    # Limit which metrics to scrape
+    metric_relabel_configs:
+      # Keep only cpu and memory metrics
+      - source_labels: [__name__]
+        regex: container_cpu_usage_seconds_total|container_spec_cpu_quota|container_spec_cpu_period|container_memory_usage_bytes|container_spec_memory_limit_bytes
+        action: keep
+      # Keep only pods from the own namespace
+      - source_labels: [namespace]
+        regex: ${env:NAMESPACE_NAME}
+        action: keep
+      # Drop metrics with empty container name
+      # Metrics with empty container name are cumulative metrics from the kubelet:
+      # https://stackoverflow.com/questions/69281327/why-container-memory-usage-is-doubled-in-cadvisor-metrics/69282328#69282328
+      - source_labels: [container]
+        regex: "^$"
+        action: drop
+
+  # Custom scraping interval (10s)
+  - job_name: 'qubex-control-plane'
+    scrape_interval: 10s
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          own_namespace: true
+        selectors:
+          - role: pod
+            label: "app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{include "kompass-compute.telemetryManager.shortName" . }}"
+      - role: pod
+        namespaces:
+          own_namespace: true
+        selectors:
+          - role: pod
+            label: "app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{include "kompass-compute.cache.shortName" . }}"
+      - role: pod
+        namespaces:
+          own_namespace: true
+        selectors:
+          - role: pod
+            label: "app.kubernetes.io/instance={{ .Release.Name }},app.kubernetes.io/name={{include "kompass-compute.hiberscaler.shortName" . }}"
+    relabel_configs:
+      - source_labels: [ __meta_kubernetes_pod_label_app_kubernetes_io_name ]
+        target_label: app_name
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $$1:$$2
+        target_label: __address__
+    # Limit which metrics to scrape
+    metric_relabel_configs:
+      # These are very low level metrics that we are unlikely to need.
+      # On the other hand, the customer might want to ingest them to his own Prometheus so we don't remove their exporting from code.
+      - source_labels: [__name__]
+        regex: 'controller_.*|go_.*|workqueue_.*'
+        action: drop

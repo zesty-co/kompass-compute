@@ -1,0 +1,212 @@
+{{- if and .Values.hiberscaler.enabled .Values.hiberscaler.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kompass-compute.hiberscaler.name" . }}
+  labels:
+    {{- include "kompass-compute.hiberscaler.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qubexconfigs"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qscalers"
+      - "qbakers"
+      - "qnodes"
+      - "resumetasks"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "create"
+      - "update"
+      - "patch"
+      - "delete"
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qscalers/status"
+      - "qbakers/status"
+      - "qnodes/status"
+      - "resumetasks/status"
+    verbs:
+      - "update"
+      - "patch"
+  # get current qcache shards, list and watch are required by controller cache
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qcacheshards"
+      - "qcachepullmappings"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "kompass.zesty.co"
+    resources:
+      - "workloaddescriptors"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "kompass.zesty.co"
+    resources:
+      - "workloaddescriptors/status"
+    verbs:
+      - "update"
+      - "patch"
+    # these are required by cert-rotator for rotations of TLS certs used in mutation webhook
+  - apiGroups:
+      - ""
+    resources:
+      - "secrets"
+    verbs:
+      - "update"
+      - "patch"
+    resourceNames:
+      - {{ include "kompass-compute.hiberscaler.webhookCertSecretName" . }}
+  - apiGroups:
+      - "admissionregistration.k8s.io"
+    resources:
+      - "mutatingwebhookconfigurations"
+      - "validatingwebhookconfigurations"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "admissionregistration.k8s.io"
+    resources:
+      - "mutatingwebhookconfigurations"
+      - "validatingwebhookconfigurations"
+    verbs:
+      - "update"
+      - "patch"
+    resourceNames:
+      - {{ include "kompass-compute.hiberscaler.name" . }}
+
+  # Required by controller cache
+  - apiGroups:
+      - ""
+    resources:
+      - "namespaces"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Manage nodes
+  - apiGroups:
+      - ""
+    resources:
+      - "nodes"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "update"
+      - "patch"
+      - "delete"
+  # Manage pods, draining and eviction
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+      - "update"
+      - "patch"
+      - "create"
+      - "delete"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods/eviction"
+    verbs:
+      - "create"
+  # Create custom events
+  - apiGroups:
+      - ""
+    resources:
+      - "events"
+    verbs:
+      - "list"
+      - "watch"
+      - "create"
+      - "patch"
+  # Discover kube-dns
+  - apiGroups:
+      - ""
+    resources:
+      - "services"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Used to get SpotOcean credentials
+  - apiGroups:
+      - ""
+    resources:
+      - "secrets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Track pod's PVCs and PVs
+  - apiGroups:
+      - ""
+    resources:
+      - "persistentvolumes"
+      - "persistentvolumeclaims"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "storage.k8s.io"
+    resources:
+      - "storageclasses"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Manage workloads
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+      - "statefulsets"
+      - "replicasets"
+      - "daemonsets"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  # Karpenter support
+  - apiGroups:
+      - "karpenter.k8s.aws"
+    resources:
+      - "ec2nodeclasses"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "karpenter.sh"
+    resources:
+      - "nodepools"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+{{- end }}

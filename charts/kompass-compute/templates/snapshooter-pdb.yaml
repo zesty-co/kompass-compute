@@ -1,0 +1,22 @@
+{{- if and .Values.snapshooter.enabled .Values.snapshooter.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kompass-compute.snapshooter.name" . }}
+  labels:
+    {{- include "kompass-compute.snapshooter.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.snapshooter.selectorLabels" . | nindent 6 }}
+
+  {{- if not (or (hasKey .Values.snapshooter.podDisruptionBudget "minAvailable") (hasKey .Values.snapshooter.podDisruptionBudget "maxUnavailable")) }}
+  minAvailable: 1 # Default value because minAvailable and maxUnavailable are not set
+  {{- end }}
+  {{- if hasKey .Values.snapshooter.podDisruptionBudget "minAvailable" }}
+  minAvailable: {{ .Values.snapshooter.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if hasKey .Values.snapshooter.podDisruptionBudget "maxUnavailable" }}
+  maxUnavailable: {{ .Values.snapshooter.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

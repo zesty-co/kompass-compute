@@ -1,0 +1,124 @@
+{{- if .Values.otel.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kompass-compute.otel.name" . }}
+  labels:
+    {{- include "kompass-compute.otel.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.otel.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.otel.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/otel-configmap.yaml") . | sha256sum }}
+        {{- with .Values.otel.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kompass-compute.otel.labels" . | nindent 8 }}
+        {{- with .Values.otel.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.otel.serviceAccountName" . }}
+      {{- with .Values.otel.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: otel
+          {{- with .Values.otel.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.otel.image" . | quote }}
+          imagePullPolicy: {{ .Values.otel.image.pullPolicy }}
+          command:
+            - /otelcol-contrib
+            - --config=/conf/relay.yaml
+          {{- with .Values.otel.extraArgs }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            {{- if .Values.otel.gomemlimit }}
+            - name: GOMEMLIMIT
+              value: {{ .Values.otel.gomemlimit | quote }}
+            {{- end }}
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "k8s.pod.ip=$(MY_POD_IP)"
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: METRICS_EXPORTER
+              value: {{ include "kompass-compute.otel.metricsExporter" . | quote }}
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.otel.developmentMode | quote }}
+            {{- with .Values.otel.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.otel.ports }}
+          ports:
+            {{- range $name, $port := . }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol | default "TCP" }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.otel.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.otel.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.otel.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.otel.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: opentelemetry-collector-configmap
+              mountPath: /conf
+              readOnly: true
+            {{- with .Values.otel.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: opentelemetry-collector-configmap
+          configMap:
+            name: {{ include "kompass-compute.otel.configName" . }}
+        {{- with .Values.otel.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.otel.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.otel.affinity" . | nindent 6 }}
+      {{- with .Values.otel.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

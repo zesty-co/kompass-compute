@@ -1,0 +1,22 @@
+{{- if and .Values.otel.enabled .Values.otel.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kompass-compute.otel.name" . }}
+  labels:
+    {{- include "kompass-compute.otel.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.otel.selectorLabels" . | nindent 6 }}
+
+  {{- if not (or (hasKey .Values.otel.podDisruptionBudget "minAvailable") (hasKey .Values.otel.podDisruptionBudget "maxUnavailable")) }}
+  minAvailable: 1 # Default value because minAvailable and maxUnavailable are not set
+  {{- end }}
+  {{- if hasKey .Values.otel.podDisruptionBudget "minAvailable" }}
+  minAvailable: {{ .Values.otel.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if hasKey .Values.otel.podDisruptionBudget "maxUnavailable" }}
+  maxUnavailable: {{ .Values.otel.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,87 @@
+{{- if .Values.uninstaller.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "kompass-compute.uninstaller.name" . }}
+  labels:
+    {{- include "kompass-compute.uninstaller.labels" . | nindent 4 }}
+  annotations:
+    {{- /* This is what defines this resource as a hook. Without this line, the job is considered part of the release. */}}
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      name: uninstall-agents
+      {{- with .Values.uninstaller.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kompass-compute.uninstaller.labels" . | nindent 8 }}
+        {{- with .Values.uninstaller.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: Never
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.uninstaller.serviceAccountName" . }}
+      {{- with .Values.uninstaller.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: uninstaller
+          {{- with .Values.uninstaller.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.uninstaller.image" . | quote }}
+          imagePullPolicy: {{ .Values.uninstaller.image.pullPolicy }}
+          args:
+            - -zap-log-level={{ default .Values.logLevel .Values.uninstaller.logLevel | lower }}
+            - -log-remote={{ default .Values.logRemote .Values.uninstaller.logRemote }}
+            - -trace-remote={{ default .Values.traceRemote .Values.uninstaller.traceRemote }}
+            {{- with .Values.uninstaller.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.uninstaller.developmentMode | quote }}
+            {{- with .Values.uninstaller.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.uninstaller.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.uninstaller.extraVolumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.uninstaller.extraVolumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.uninstaller.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.uninstaller.affinity" . | nindent 6 }}
+      {{- with .Values.uninstaller.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

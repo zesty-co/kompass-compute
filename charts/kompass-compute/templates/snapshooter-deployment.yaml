@@ -1,0 +1,109 @@
+{{- if .Values.snapshooter.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kompass-compute.snapshooter.name" . }}
+  labels:
+    {{- include "kompass-compute.snapshooter.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.snapshooter.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.snapshooter.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- include "kompass-compute.annotations.qubexConfigChecksum" . | nindent 8 }}
+        {{- with .Values.snapshooter.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kompass-compute.snapshooter.labels" . | nindent 8 }}
+        {{- with .Values.snapshooter.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.snapshooter.serviceAccountName" . }}
+      {{- with .Values.snapshooter.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: snapshooter
+          {{- with .Values.snapshooter.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.snapshooter.image" . | quote }}
+          imagePullPolicy: {{ .Values.snapshooter.image.pullPolicy }}
+          args:
+            - -zap-log-level={{ default .Values.logLevel .Values.snapshooter.logLevel | lower }}
+            - -log-remote={{ default .Values.logRemote .Values.snapshooter.logRemote }}
+            - -trace-remote={{ default .Values.traceRemote .Values.snapshooter.traceRemote }}
+            {{- with .Values.snapshooter.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.snapshooter.developmentMode | quote }}
+            {{- with .Values.snapshooter.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.snapshooter.ports }}
+          ports:
+            {{- range $name, $port := . }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol | default "TCP" }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.snapshooter.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.snapshooter.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.snapshooter.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.snapshooter.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- with .Values.snapshooter.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- with .Values.snapshooter.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.snapshooter.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.snapshooter.affinity" . | nindent 6 }}
+      {{- with .Values.snapshooter.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.snapshooter.terminationGracePeriodSeconds }}
+{{- end }}

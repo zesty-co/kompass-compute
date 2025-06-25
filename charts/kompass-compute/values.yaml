@@ -1,0 +1,1007 @@
+# Global image pull secrets
+# A list of secrets to use for pulling images from private registries.
+# Example:
+# imagePullSecrets:
+#   - name: "my-registry-secret"
+imagePullSecrets: []
+
+# Override the chart name.
+# nameOverride: ""
+# Override the full name of the chart.
+# fullnameOverride: ""
+
+# Global fallback image tag for all components.
+# Used if a component's specific image.tag is not set.
+# If this is also not set (null or empty), Chart.AppVersion is used as the default.
+tag: ~
+
+# Global log level for all components. Can be overridden per component.
+# Valid levels: "debug", "info", "warn", "error".
+logLevel: "info"
+# Global setting to enable/disable remote logging for all components. Can be overridden per component.
+logRemote: "true"
+# Global setting to enable/disable remote tracing for all components. Can be overridden per component.
+traceRemote: "true"
+# Global setting to enable/disable remote monitoring for all components. Can be overridden per component.
+monitorRemote: "true"
+# Global setting for development mode features for all components. Can be overridden per component.
+developmentMode: "false"
+# Name of the Kubernetes secret created by the Kompass Insight.
+kompassInsightSecret: "kompass-insights-secret"
+
+# -- Cache component configuration
+cache:
+  # If true, deploys the Cache component.
+  enabled: true
+
+  # Number of replicas for the Cache Deployment.
+  replicaCount: 2
+
+  image:
+    # Image repository for the Cache component.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/cache-controller
+    # Image pull policy. Valid values: Always, IfNotPresent, Never.
+    pullPolicy: Always
+    # Specific image tag for the Cache component.
+    # Overrides the global 'tag' and Chart.AppVersion if set.
+    # If empty, uses global 'tag' or Chart.AppVersion.
+    tag: ""
+
+  # Extra command-line arguments to pass to the Cache container.
+  # Example:
+  # extraArgs:
+  #   - --some-flag=value
+  extraArgs: [ ]
+
+  # Extra environment variables to set in the Cache container.
+  # Example:
+  # extraEnv:
+  # - name: SOME_VAR
+  #   value: 'some value'
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  # If null, global values are used.
+  logLevel: ~ # Log level for the Cache component.
+  logRemote: ~ # Enable/disable remote logging for the Cache component.
+  traceRemote: ~ # Enable/disable remote tracing for the Cache component.
+  developmentMode: ~ # Enable/disable development mode for the Cache component.
+
+  ports:
+    # Port configuration for Cache probes.
+    probes:
+      name: probes # Name of the probes port.
+      port: 8081  # Port number for health and readiness probes.
+
+  rbac:
+    # If true, creates RBAC resources (ClusterRoles, ClusterRoleBindings) for the Cache component.
+    create: true
+
+  serviceAccount:
+    # If true, a ServiceAccount is created for the Cache component.
+    create: true
+    # If true, automatically mount ServiceAccount API credentials.
+    automount: true
+    # Annotations to add to the created ServiceAccount.
+    annotations: {}
+    # Name of the ServiceAccount.
+    # If not set and create is true, a name is generated using the fullname template.
+    # If create is false, this specifies an existing ServiceAccount to use.
+    name: ""
+
+  # Annotations to add to the Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+  # Labels to add to the Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  podLabels: {}
+
+  # Security context for the Cache Pods.
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Security context for the Cache containers.
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  # Resource requests and limits for the Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  # Probe configurations for the Cache container.
+  # See: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    httpGet:
+      path: /healthz # Endpoint for the startup probe.
+      port: probes  # Port name defined in 'ports'.
+    failureThreshold: 50 # Number of consecutive failures for the probe to be considered failed.
+    periodSeconds: 10    # How often (in seconds) to perform the probe.
+    timeoutSeconds: 5    # Number of seconds after which the probe times out.
+  livenessProbe:
+    httpGet:
+      path: /healthz # Endpoint for the liveness probe.
+      port: probes  # Port name defined in 'ports'.
+    initialDelaySeconds: 15 # Number of seconds after the container has started before liveness probes are initiated.
+    periodSeconds: 20       # How often (in seconds) to perform the probe.
+    timeoutSeconds: 5       # Number of seconds after which the probe times out.
+  readinessProbe:
+    httpGet:
+      path: /readyz # Endpoint for the readiness probe.
+      port: probes # Port name defined in 'ports'.
+    initialDelaySeconds: 5 # Number of seconds after the container has started before readiness probes are initiated.
+    periodSeconds: 10      # How often (in seconds) to perform the probe.
+    timeoutSeconds: 5      # Number of seconds after which the probe times out.
+
+  # Additional volumes to mount in the Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/storage/volumes/
+  extraVolumes: []
+  # Example:
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+  # Additional volume mounts for the Cache containers.
+  # See: https://kubernetes.io/docs/concepts/storage/volumes/
+  extraVolumeMounts: []
+  # Example:
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+  # Node selector for scheduling Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
+
+  # Tolerations for scheduling Cache Pods.
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: []
+
+  # Affinity rules for scheduling Cache Pods. Overrides default affinity if set.
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
+  # If true, applies default affinity rules. Ignored if 'affinity' is set.
+  useDefaultAffinity: true
+
+  # PodDisruptionBudget configuration for the Cache deployment.
+  # See: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+  podDisruptionBudget:
+    # If true, creates a PodDisruptionBudget for the Cache deployment.
+    # This prevents downtime during voluntary disruptions (e.g., node upgrades).
+    enabled: true
+
+    # Minimum number/percentage of pods that must remain available during a voluntary disruption.
+    # Cannot be used if 'maxUnavailable' is set. Example: 1 or "25%".
+    # minAvailable: 1
+
+    # Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
+    # Cannot be used if 'minAvailable' is set. Example: 1 or "25%".
+    # If not set and PDB is enabled, defaults to 1.
+    # maxUnavailable: 1
+
+# -- Hiberscaler component configuration
+hiberscaler:
+  # If true, deploys the Hiberscaler component.
+  enabled: true
+
+  # Number of replicas for the Hiberscaler Deployment.
+  replicaCount: 1
+
+  image:
+    # Image repository for the Hiberscaler component.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/hiberscaler-controller
+    # Image pull policy.
+    pullPolicy: Always
+    # Specific image tag for the Hiberscaler component.
+    tag: ""
+
+  # Extra command-line arguments to pass to the Hiberscaler container.
+  extraArgs: [ ]
+  # Extra environment variables to set in the Hiberscaler container.
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  logLevel: ~
+  logRemote: ~
+  traceRemote: ~
+  developmentMode: ~
+
+  ports:
+    # Port for metrics exposition (e.g., Prometheus).
+    metrics:
+      name: metrics
+      port: 8080
+    # Port for health and readiness probes.
+    probes:
+      name: probes
+      port: 8081
+    # Port for the Node server.
+    nodeServer:
+      name: node-server
+      port: 8082
+    # Port for the webhook server.
+    webServer:
+      name: webhook-server
+      port: 9443 # Internal port for the webhook server.
+      serviceType: ClusterIP # Service type for the webhook.
+      servicePort: 443       # Port exposed by the webhook service.
+
+  rbac:
+    # If true, creates RBAC resources for the Hiberscaler component.
+    create: true
+
+  serviceAccount:
+    # If true, a ServiceAccount is created for the Hiberscaler component.
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  # Annotations to add to the Hiberscaler Pods.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+  # Labels to add to the Hiberscaler Pods.
+  podLabels: {}
+
+  # Security context for the Hiberscaler Pods.
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Security context for the Hiberscaler containers.
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  # Resource requests and limits for the Hiberscaler Pods.
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      cpu: 2000m
+      memory: 4096Mi
+
+  # Probe configurations for the Hiberscaler container.
+  startupProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    failureThreshold: 50
+    periodSeconds: 10
+    timeoutSeconds: 5
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: probes
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  extraVolumes: []
+  extraVolumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  useDefaultAffinity: true
+
+  podDisruptionBudget:
+    # If true, creates a PodDisruptionBudget for the Hiberscaler deployment.
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+# -- ImageSizeCalculator component configuration
+# This component is responsible for calculating the size of container images.
+# It typically runs as a Job or a similar workload.
+imageSizeCalculator:
+  # If true, deploys resources related to the ImageSizeCalculator.
+  enabled: true
+
+  image:
+    # Image repository for the ImageSizeCalculator.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/image-size-calculator
+    # Specific image tag for the ImageSizeCalculator.
+    tag: ""
+
+  rbac:
+    # If true, creates RBAC resources (e.g., Role, RoleBinding) for the ImageSizeCalculator.
+    create: true
+
+  serviceAccount:
+    # If true, a ServiceAccount is created for the ImageSizeCalculator.
+    create: true
+    automount: true
+    annotations: {}
+    # Name of the ServiceAccount for the ImageSizeCalculator.
+    name: ""
+  # Note: Other common deployment parameters (replicaCount, probes, etc.) might not be applicable
+  # if this component runs as a Job. Refer to its specific templates.
+
+# -- OTEL (OpenTelemetry) Collector configuration
+otel:
+  # If true, deploys the OTEL Collector component.
+  enabled: true
+
+  # Number of replicas for the OTEL Collector Deployment.
+  replicaCount: 1
+
+  image:
+    # Image repository for the OTEL Collector.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/otel
+    pullPolicy: Always
+    # Specific image tag for the OTEL Collector.
+    tag: ""
+
+  extraArgs: [ ]
+  extraEnv: [ ]
+
+  # Go memory limit for the OTEL collector. Example: "400MiB".
+  gomemlimit: "400MiB"
+  # Component-specific override for global monitorRemote.
+  monitorRemote: ~
+  # Component-specific override for global developmentMode.
+  developmentMode: ~
+
+  ports:
+    # Port for OTLP gRPC receiver.
+    otlp:
+      name: otlp
+      port: 4317
+    # Port for OTLP HTTP receiver.
+    otlpHttp:
+      name: otlp-http
+      port: 4318
+    # Port for OTEL Collector's own health and readiness probes.
+    probes:
+      name: probes
+      port: 13133
+
+  rbac:
+    # If true, creates RBAC resources for the OTEL Collector.
+    create: true
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  startupProbe:
+    failureThreshold: 50
+    httpGet:
+      path: / # Health check path for OTEL collector.
+      port: probes
+  livenessProbe:
+    httpGet:
+      path: / # Health check path for OTEL collector.
+      port: probes
+    timeoutSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: / # Health check path for OTEL collector.
+      port: probes
+    timeoutSeconds: 8
+
+  extraVolumes: []
+  extraVolumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  useDefaultAffinity: true
+
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+# -- Snapshooter component configuration
+snapshooter:
+  # If true, deploys the Snapshooter component.
+  enabled: true
+
+  # Number of replicas for the Snapshooter Deployment.
+  replicaCount: 1
+
+  image:
+    # Image repository for the Snapshooter component.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/snapshooter
+    pullPolicy: Always
+    # Specific image tag for the Snapshooter component.
+    tag: ""
+
+  extraArgs: [ ]
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  logLevel: ~
+  logRemote: ~
+  traceRemote: ~
+  developmentMode: ~
+
+  ports:
+    # Port for Snapshooter health and readiness probes.
+    probes:
+      name: probes
+      port: 8081
+
+  rbac:
+    # If true, creates RBAC resources for the Snapshooter component.
+    create: true
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  resources:
+    limits:
+      cpu: 300m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  startupProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    failureThreshold: 50
+    periodSeconds: 10
+    timeoutSeconds: 5
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: probes
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  extraVolumes: []
+  extraVolumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  useDefaultAffinity: true
+
+  # Grace period (in seconds) for the Snapshooter pod to terminate.
+  terminationGracePeriodSeconds: 60
+
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+# -- Telemetry Manager component configuration
+telemetryManager:
+  # If true, deploys the Telemetry Manager component.
+  enabled: true
+
+  # Number of replicas for the Telemetry Manager Deployment.
+  replicaCount: 1
+
+  image:
+    # Image repository for the Telemetry Manager component.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/telemetry-manager
+    pullPolicy: Always
+    # Specific image tag for the Telemetry Manager component.
+    tag: ""
+
+  extraArgs: [ ]
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  logLevel: ~
+  logRemote: ~
+  traceRemote: ~
+  developmentMode: ~
+
+  ports:
+    # Port for Telemetry Manager health and readiness probes.
+    probes:
+      name: probes
+      port: 8081
+    # Port for metrics exposition.
+    metrics:
+      name: metrics
+      port: 8080
+
+  rbac:
+    # If true, creates RBAC resources for the Telemetry Manager component.
+    create: true
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  # Annotations to add to the Telemetry Manager Pods.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+  podLabels: {}
+
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  resources:
+    limits:
+      cpu: 400m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+  startupProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    failureThreshold: 50
+    periodSeconds: 10
+    timeoutSeconds: 5
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: probes
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: probes
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  extraVolumes: []
+  extraVolumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  useDefaultAffinity: true
+
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 1
+    # maxUnavailable: 1
+
+# -- Vector component configuration (for log aggregation/forwarding)
+vector:
+  # If true, deploys the Vector component (typically as a DaemonSet).
+  enabled: true
+
+  image:
+    # Image repository for Vector.
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/vector
+    pullPolicy: Always
+    # Specific image tag for Vector. Note: Vector often has its own versioning.
+    tag: ""
+
+  extraArgs: [ ]
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  logLevel: ~
+  developmentMode: ~
+
+  rbac:
+    # If true, creates RBAC resources for Vector.
+    create: true
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  # Security context for Vector Pods.
+  # Vector might require specific privileges depending on its configuration (e.g., to read host logs).
+  podSecurityContext:
+    fsGroup: 1000 # May need adjustment based on Vector's requirements for accessing log files.
+    seccompProfile:
+      type: RuntimeDefault
+    # Vector might require root privileges to run, depending on data sources.
+    # runAsUser: 0
+    # runAsGroup: 0
+    # runAsNonRoot: false
+
+  # Security context for Vector containers.
+  securityContext:
+    allowPrivilegeEscalation: false # Should be true if Vector needs root.
+    capabilities:
+      drop:
+        - ALL # May need to add capabilities like DAC_READ_SEARCH if reading restricted host paths.
+    readOnlyRootFilesystem: true # May need to be false or have specific volumeMounts for Vector's data/config.
+
+  # Resource requests and limits for Vector Pods.
+  resources:
+    limits:
+      cpu: 300m
+      memory: 600Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+
+  extraVolumes: []
+  extraVolumeMounts: []
+
+  # Configuration for Vector running on normal Kubernetes nodes.
+  normal:
+    # Node selector for Vector pods on normal nodes.
+    nodeSelector: { }
+    # Tolerations for Vector pods on normal nodes.
+    tolerations:
+      - operator: Exists # Tolerates all taints by default.
+    # Affinity settings for Vector pods on normal nodes.
+    affinity: { }
+    useDefaultAffinity: true # Applies default affinity (e.g., anti-affinity with other vector pods on the same node if applicable).
+
+  # Configuration for Vector running on QNode (Qubex specific nodes).
+  qNode:
+    # Node selector for Vector pods on QNodes.
+    nodeSelector: {}
+    # Tolerations for Vector pods on QNodes.
+    tolerations:
+      - operator: Exists
+    # Affinity settings for Vector pods on QNodes.
+    affinity: {}
+    useDefaultAffinity: true
+
+# -- Uninstaller Job configuration
+# This component is typically a Job responsible for cleanup tasks during chart uninstallation.
+uninstaller:
+  # If true, resources for the Uninstaller Job are created.
+  enabled: true
+
+  image:
+    # Image for the Uninstaller Job (e.g., busybox or a custom cleanup script container).
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/uninstaller
+    pullPolicy: Always
+    # Specific image tag for the Uninstaller.
+    tag: ""
+
+  extraArgs: [ ]
+  extraEnv: [ ]
+
+  # Component-specific overrides for global settings.
+  logLevel: ~
+  logRemote: ~
+  traceRemote: ~
+  developmentMode: ~
+
+  rbac:
+    # If true, creates RBAC resources (e.g., Role, RoleBinding, ServiceAccount) for the Uninstaller Job.
+    create: true
+
+  serviceAccount:
+    create: true
+    automount: true
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+  podLabels: {}
+
+  # Security context for the Uninstaller Pod.
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # Security context for the Uninstaller container.
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  # Resource requests and limits for the Uninstaller Pod.
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+  extraVolumes: []
+  extraVolumeMounts: []
+  nodeSelector: {}
+  tolerations: []
+
+  # Affinity settings for the Uninstaller Job Pod.
+  # Typically, uninstallers don't need complex affinity.
+  affinity: {}
+
+# -- QNode specific configuration
+qnode:
+  # If true, enables QNode specific features or deployments.
+  # The exact impact depends on how this is used in templates.
+  enabled: true
+
+# QubexConfig
+qubexConfig:
+  # The cloud provider
+  cloudProvider: eks
+  # Path to NodeAgent HTTP address prefix
+  # The S3 bucket from which the QNode will download the Qubex assets
+  # Override the node agent HTTP address prefix if you want to use a custom one.
+  # Default is https://qubex-assets.s3.eu-west-3.amazonaws.com/<HIBERSCALER_TAG>
+  # nodeAgentHTTPAddressPrefix: ...
+
+  # List of supported architectures
+  # architectures: [...]
+  infraConfig:
+    aws: {}
+      # The zones to take into account
+      # zones: [...]
+
+      # Additional AWS tags added to resources created by Qubex Controllers
+      # additionalTags: ...
+
+      # The SQS queue for spot failures events
+      # spotFailuresQueueUrl: ...
+
+      # The ID of the S3 VPC endpoint
+      # s3VpcEndpointID: ...
+
+      # The IP addresses for S3 VPC endpoint per region
+      # s3VpcEndpointIPAddresses: ...
+
+      # Bucket size used to cover for AWS API rate limit token bucket implementation
+      # resumeVMStartInstanceBucketSize: ...
+
+      # Bucket fill rate used to cover for AWS API rate limit token bucket implementation
+      # resumeVMStartInstanceFillRate: ...
+
+      # Whether or not to enable autodiscovery, used for preventing race conditions during uninstallation
+      # autodiscovery: true
+
+      # The type of container runtime to use
+      # containerRuntime: ...
+
+      # Enable non-trunking instances
+      # enableNonTrunkingInstances: ...
+
+      # Enable m7i-flex instances
+      # enableM7FlexInstances: ...
+    # The disk size used by Qubex VMs will be (BaseDiskSize + <instance memory size>)
+    # baseDiskSize: ...
+
+  # The default workload protection threshold
+  # defaultWorkloadProtectionThreshold: ...
+
+  # The ratio between the number of VM resumed and the number of the VMs that will be allowed to join the cluster
+  # resumingNodesRatio: ...
+
+  # How many instance types should be selected for each QScaler
+  # instanceTypesCount: ...
+
+  # Maximum CPU for instance type
+  # instanceTypeMaxCPU: ...
+
+  spotOceanConfig: {}
+    # Enable turns on Spot.io Ocean integration
+    # enable: ...
+
+    # SpotOceanID is ID of the spot ocean cluster
+    # spotOceanID: ...
+
+    # SpotOceanSecretName is the name of the secret containing the spot.io credentials
+    # spotOceanSecretName: ...
+
+    # SpotOceanSecretNamespace is the namespace of the secret containing the spot.io credentials
+    # spotOceanSecretNamespace: ...
+
+    # SpotOceanSecretTokenKey is the key in the secret containing the spot.io token
+    # spotOceanSecretTokenKey: ...
+
+    # SpotOceanSecretAccountKey is the key in the secret containing the spot.io account
+    # spotOceanSecretAccountKey: ...
+
+  drainingConfig: {}
+    # Scale in protection for Qubex VMs. Before this time elapses, machines will not be scheduled for removal
+    # scaleInProtectionDuration: ...
+
+    # The grace period of self managed drain before force termination
+    # drainGracePeriod: ...
+
+    # The time after Qubex will create another replacement pod for the same workload
+    # replacementPodRetryInterval: ...
+
+  disturbanceConfig: {}
+    # Time to wait for disturbance to be cold before committing a disturbance event.
+    # cooldownPeriod: ...
+  cacheConfig:
+    # The disk size for container cache in GB
+    # diskSize: ...
+
+    # The amount of disk which can be filled by cached images
+    # diskFillAmount: ...
+
+    # List of custom images which have to be cached
+    # additionalImages: []
+
+    # Default interval between QCache revisions creation
+    # revisionMinCreationInterval: ...
+
+    # Number of workloads per RevisionCreation
+    # workloadsPerRevisionCreation: ...
+
+    # Number of concurrent image pulls per revision creation
+    # concurrentImagePullPerRevisionCreation: ...
+
+    # Number of concurrent layers pulls per revision creation
+    # concurrentLayerPullPerRevisionCreation: ...
+
+    # Timeout for QCacheRevisionCreation to finish
+    # revisionCreationTimeout: ...
+
+    # Old Workload expiration time
+    # workloadExpirationTime: ...
+
+    # Old Workload expiration count
+    # workloadsExpirationCount: ...
+
+    # Number of shards to merge
+    # shardsToMergeCount: ...
+
+    # Acceptable ratio of missing images in cache to qualify for resumption
+    # acceptableLagResumeRatio: ...
+    imageSizeCalculatorConfig: {}
+      # Override the image size calculator image if you want to use a custom one.
+      # Default is calculated based on the image repository and tag.
+      # image: ...
+
+      # Override the image size calculator job name if you want to use a custom one.
+      # Default configured by the CRD.
+      # jobNamePrefix: ...
+
+      # Override the image size calculator service account name if you want to use a custom one.
+      # Default is calculated from serviceAccountName.
+      # serviceAccountName: ...
+
+      # Override the image size calculator pull secrets if you want to use a custom one.
+      # Default is taken from the global imagePullSecrets.
+      # pullSecrets: [...]
+
+  # Snapshooter interval
+  # snapshooterInterval: ...
+
+  # Enable experimental features
+  # enableExperimentalFeatures: ...
+  zestyConfig: {}
+    # Upload interval
+    # uploadInterval: ...
+
+# -- CachePullMappings: Configuration for mapping image registries to proxies/caches.
+# Defines how image pull requests for certain registries should be redirected.
+cachePullMappings: {}
+#  dockerhub:
+#    - proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/zesty-dockerhub
+#  ecr:
+#    - proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/zesty-ecr
+#  ghcr:
+#    - proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/zesty-ghcr
+#  k8s:
+#    - proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/zesty-k8s
+#  quay:
+#    - proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/zesty-quay
+#  custom:
+#    - originalHost: custom.registry.com
+#      additionalAliases:
+#        - custom-1.registry.com
+#      proxyAddress: ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/CUSTOM
+#      pullSecret: ""
+#      type: PublicDefault
