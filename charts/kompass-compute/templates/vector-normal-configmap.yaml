@@ -1,0 +1,11 @@
+{{- if .Values.vector.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kompass-compute.vector.normal.configMapName" . }}
+  labels:
+    {{- include "kompass-compute.vector.labels" . | nindent 4 }}
+data:
+  config.yaml: |-
+    {{ tpl (.Files.Get "files/vector/normal.yaml") . | nindent 4 }}
+{{- end }}

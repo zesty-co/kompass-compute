@@ -1,0 +1,140 @@
+{{- if .Values.vector.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "kompass-compute.vector.normal.name" . }}
+  labels:
+    {{- include "kompass-compute.vector.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.vector.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/vector-normal-configmap.yaml") . | sha256sum }}
+        {{- with .Values.vector.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kompass-compute.vector.labels" . | nindent 8 }}
+        {{- with .Values.vector.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.vector.serviceAccountName" . }}
+      {{- with .Values.vector.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: vector
+          {{- with .Values.vector.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.vector.image" . | quote }}
+          imagePullPolicy: {{ .Values.vector.image.pullPolicy }}
+          args:
+            - --config-dir
+            - /etc/vector/
+            {{- with .Values.vector.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: VECTOR_SELF_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: VECTOR_SELF_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: VECTOR_SELF_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: PROCFS_ROOT
+              value: "/host/proc"
+            - name: SYSFS_ROOT
+              value: "/host/sys"
+            - name: VECTOR_LOG
+              value: {{ default .Values.logLevel .Values.vector.logLevel | lower }}
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.vector.developmentMode | quote }}
+            {{- with .Values.vector.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.vector.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: "/vector-data-dir"
+            - name: config
+              mountPath: "/etc/vector/"
+              readOnly: true
+            - name: var-log
+              mountPath: /var/log/
+              readOnly: true
+            - name: var-lib
+              mountPath: /var/lib
+              readOnly: true
+            - name: procfs
+              mountPath: /host/proc
+              readOnly: true
+            - name: sysfs
+              mountPath: /host/sys
+              readOnly: true
+            # Required for journalctl to work
+            - name: host-machine-id
+              mountPath: /etc/machine-id
+              readOnly: true
+            {{- with .Values.vector.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "kompass-compute.vector.normal.configMapName" . }}
+        - name: data
+          hostPath:
+            path: "/var/lib/kompass-compute-vector"
+        - name: var-log
+          hostPath:
+            path: /var/log/
+        - name: var-lib
+          hostPath:
+            path: /var/lib/
+        - name: procfs
+          hostPath:
+            path: /proc
+        - name: sysfs
+          hostPath:
+            path: /sys
+        # Required for journalctl to work
+        - name: host-machine-id
+          hostPath:
+            path: /etc/machine-id
+            type: File
+        {{- with .Values.vector.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.vector.normal.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.vector.normal.affinity" . | nindent 6 }}
+      {{- with .Values.vector.normal.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

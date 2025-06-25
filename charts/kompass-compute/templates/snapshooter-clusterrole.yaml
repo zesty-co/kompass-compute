@@ -1,0 +1,55 @@
+{{- if and .Values.snapshooter.enabled .Values.snapshooter.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "kompass-compute.snapshooter.name" . }}
+  labels:
+    {{- include "kompass-compute.snapshooter.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "qscaler.qubex.ai"
+    resources:
+      - "qubexconfigs"
+      - "qscalers"
+      - "qbakers"
+      - "qnodes"
+      - "resumetasks"
+      - "qcacherevisioncreations"
+      - "qcacheshards"
+      - "qcachepullmappings"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "kompass.zesty.co"
+    resources:
+      - "workloaddescriptors"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "pods/log"
+      - "endpoints"
+      - "services"
+      - "nodes"
+      - "nodes/proxy"
+      - "nodes/metrics"
+      - "events"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+{{- end }}

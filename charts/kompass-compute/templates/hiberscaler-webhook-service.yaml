@@ -1,0 +1,17 @@
+{{- if .Values.hiberscaler.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kompass-compute.hiberscaler.webhookServiceName" . }}
+  labels:
+    {{- include "kompass-compute.hiberscaler.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.hiberscaler.ports.webServer.serviceType }}
+  ports:
+    - port: {{ .Values.hiberscaler.ports.webServer.servicePort }}
+      targetPort: webhook-server
+      protocol: TCP
+      name: webhook-server
+  selector:
+    {{- include "kompass-compute.hiberscaler.selectorLabels" . | nindent 4 }}
+{{- end }}

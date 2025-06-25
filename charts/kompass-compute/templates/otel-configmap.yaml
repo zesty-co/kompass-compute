@@ -1,0 +1,13 @@
+{{- if .Values.otel.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "kompass-compute.otel.configName" . }}
+  labels:
+    {{- include "kompass-compute.otel.labels" . | nindent 4 }}
+data:
+  relay.yaml: |-
+    {{ tpl (.Files.Get "files/otel/relay.yaml") . | nindent 4 }}
+  prometheus.yaml: |-
+    {{ tpl (.Files.Get "files/otel/prometheus.yaml") . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,118 @@
+{{- if .Values.hiberscaler.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kompass-compute.hiberscaler.name" . }}
+  labels:
+    {{- include "kompass-compute.hiberscaler.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.hiberscaler.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.hiberscaler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- include "kompass-compute.annotations.qubexConfigChecksum" . | nindent 8 }}
+        {{- with .Values.hiberscaler.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "kompass-compute.hiberscaler.labels" . | nindent 8 }}
+        {{- with .Values.hiberscaler.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kompass-compute.hiberscaler.serviceAccountName" . }}
+      {{- with .Values.hiberscaler.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: hiberscaler
+          {{- with .Values.hiberscaler.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: {{ include "kompass-compute.hiberscaler.image" . | quote }}
+          imagePullPolicy: {{ .Values.hiberscaler.image.pullPolicy }}
+          args:
+            - -zap-log-level={{ default .Values.logLevel .Values.hiberscaler.logLevel | lower }}
+            - -log-remote={{ default (.Values.logRemote | quote) (.Values.hiberscaler.logRemote | quote) }}
+            - -trace-remote={{ default (.Values.traceRemote | quote) (.Values.hiberscaler.traceRemote | quote) }}
+            {{- with .Values.hiberscaler.extraArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: WEBHOOK_SERVICE_NAME
+              value: {{ include "kompass-compute.hiberscaler.webhookServiceName" . }}
+            - name: WEBHOOK_CERT_SECRET_NAME
+              value: {{ include "kompass-compute.hiberscaler.webhookCertSecretName" . }}
+            - name: WEBHOOK_MUTATING_CONFIG_NAME
+              value: {{ include "kompass-compute.hiberscaler.name" . }}
+            - name: WEBHOOK_VALIDATING_CONFIG_NAME
+              value: {{ include "kompass-compute.hiberscaler.name" . }}
+            - name: NAMESPACE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DEVELOPMENT_MODE
+              value: {{ default .Values.developmentMode .Values.hiberscaler.developmentMode | quote }}
+            {{- with .Values.hiberscaler.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ include "kompass-compute.insightSecretName" . }}
+          {{- with .Values.hiberscaler.ports }}
+          ports:
+            {{- range $name, $port := . }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol | default "TCP" }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.hiberscaler.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.hiberscaler.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.hiberscaler.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.hiberscaler.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: webhook-cert
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
+            {{- with .Values.hiberscaler.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: webhook-cert
+          secret:
+            secretName: {{ include "kompass-compute.hiberscaler.webhookCertSecretName" . }}
+        {{- with .Values.hiberscaler.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.hiberscaler.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "kompass-compute.hiberscaler.affinity" . | nindent 6 }}
+      {{- with .Values.hiberscaler.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

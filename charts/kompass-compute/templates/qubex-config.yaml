@@ -1,0 +1,8 @@
+apiVersion: qscaler.qubex.ai/v1alpha1
+kind: QubexConfig
+metadata:
+  name: {{ include "kompass-compute.qubexConfig.name" . }}
+  labels:
+      {{- include "kompass-compute.qubexConfig.labels" . | nindent 4 }}
+data:
+  {{- include "kompass-compute.qubexConfig.config" . | nindent 2 }}

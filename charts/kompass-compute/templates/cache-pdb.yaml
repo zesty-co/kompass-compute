@@ -1,0 +1,22 @@
+{{- if and .Values.cache.enabled .Values.cache.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kompass-compute.cache.name" . }}
+  labels:
+    {{- include "kompass-compute.cache.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.cache.selectorLabels" . | nindent 6 }}
+
+  {{- if not (or (hasKey .Values.cache.podDisruptionBudget "minAvailable") (hasKey .Values.cache.podDisruptionBudget "maxUnavailable")) }}
+  minAvailable: 1 # Default value because minAvailable and maxUnavailable are not set
+  {{- end }}
+  {{- if hasKey .Values.cache.podDisruptionBudget "minAvailable" }}
+  minAvailable: {{ .Values.cache.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if hasKey .Values.cache.podDisruptionBudget "maxUnavailable" }}
+  maxUnavailable: {{ .Values.cache.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

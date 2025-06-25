@@ -1,0 +1,22 @@
+{{- if and .Values.telemetryManager.enabled .Values.telemetryManager.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kompass-compute.telemetryManager.name" . }}
+  labels:
+    {{- include "kompass-compute.telemetryManager.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.telemetryManager.selectorLabels" . | nindent 6 }}
+
+  {{- if not (or (hasKey .Values.telemetryManager.podDisruptionBudget "minAvailable") (hasKey .Values.telemetryManager.podDisruptionBudget "maxUnavailable")) }}
+  minAvailable: 1 # Default value because minAvailable and maxUnavailable are not set
+  {{- end }}
+  {{- if hasKey .Values.telemetryManager.podDisruptionBudget "minAvailable" }}
+  minAvailable: {{ .Values.telemetryManager.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if hasKey .Values.telemetryManager.podDisruptionBudget "maxUnavailable" }}
+  maxUnavailable: {{ .Values.telemetryManager.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}

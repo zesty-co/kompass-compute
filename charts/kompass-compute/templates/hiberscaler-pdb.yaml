@@ -1,0 +1,22 @@
+{{- if and .Values.hiberscaler.enabled .Values.hiberscaler.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "kompass-compute.hiberscaler.name" . }}
+  labels:
+    {{- include "kompass-compute.hiberscaler.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kompass-compute.hiberscaler.selectorLabels" . | nindent 6 }}
+
+  {{- if not (or (hasKey .Values.hiberscaler.podDisruptionBudget "minAvailable") (hasKey .Values.hiberscaler.podDisruptionBudget "maxUnavailable")) }}
+  minAvailable: 1 # Default value because minAvailable and maxUnavailable are not set
+  {{- end }}
+  {{- if hasKey .Values.hiberscaler.podDisruptionBudget "minAvailable" }}
+  minAvailable: {{ .Values.hiberscaler.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if hasKey .Values.hiberscaler.podDisruptionBudget "maxUnavailable" }}
+  maxUnavailable: {{ .Values.hiberscaler.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+{{- end }}
