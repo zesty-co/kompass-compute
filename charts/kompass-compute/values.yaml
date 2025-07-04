@@ -342,6 +342,8 @@ imageSizeCalculator:
     # Specific image tag for the ImageSizeCalculator.
     tag: ""
 
+  extraEnv: [ ]
+
   rbac:
     # If true, creates RBAC resources (e.g., Role, RoleBinding) for the ImageSizeCalculator.
     create: true

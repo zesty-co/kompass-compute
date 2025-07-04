@@ -882,6 +882,7 @@ Component: QubexConfig
         "image" (include "kompass-compute.imageSizeCalculator.image" .)
         "serviceAccountName" (include "kompass-compute.imageSizeCalculator.serviceAccountName" .)
         "pullSecrets" (.Values.imagePullSecrets | default list )
+        "extraEnv" (.Values.imageSizeCalculator.extraEnv | default list )
     )
 )
 -}}
