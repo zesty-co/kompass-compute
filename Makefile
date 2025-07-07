@@ -7,10 +7,10 @@ SHELL := /bin/bash
 CHARTS := charts/kompass-compute charts/kompass-compute-crd
 
 .PHONY: all
-all: compare lint template docs ## Run all operations: lint, template and docs
+all: compare-crds lint template docs ## Run all operations: lint, template and docs
 
-.PHONY: compare
-compare: ## Compare crd and templates folders, fail if different
+.PHONY: compare-crds
+compare-crds: ## Compare crds from charts/kompass-compute/crds and charts/kompass-compute-crd
 	@echo "Comparing crd and templates folders..."
 	@diff -r charts/kompass-compute/crds charts/kompass-compute-crd/templates || \
 		{ echo "ERROR: Folders differ!"; exit 1; }

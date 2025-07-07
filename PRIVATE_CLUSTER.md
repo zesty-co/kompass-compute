@@ -29,9 +29,12 @@ Kompass Compute requires access to Amazon Linux YUM repository to download syste
 
 You have to create a S3 VPC gateway endpoint in the VPC in which the EKS cluster is deployed and configure route tables in the subnets where your EKS nodes are deployed.
 
+The YUM repository is hosted in an S3 bucket.  
+The S3 VPC gateway endpoint allows private communication to S3 by mapping the public IP addresses of the S3 service and forwarding traffic over a private connection.
+
 ## Granting AWS API Access to Kompass Compute Deployments:
 
-- EKA Auth VPC private endpoint
+- [EKS Auth VPC private endpoint](https://docs.aws.amazon.com/eks/latest/userguide/vpc-interface-endpoints.html#vpc-endpoint-create)
   
   _Used to authenticate pods when using EKS Pod Identity to AWS API._
 
