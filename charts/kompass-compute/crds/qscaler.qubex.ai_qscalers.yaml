@@ -235,6 +235,12 @@ spec:
                                   type: string
                               type: object
                             type: array
+                          allowPublicIP:
+                            description: |-
+                              Whether to add a public IP to the network interface of the underlying VM
+                              The field will be passed as is to the associatePublicIpAddress parameter of the AWS API
+                              nil value means that the default value of the AWS API will be used
+                            type: boolean
                           allowedInstanceTypes:
                             description: The AWS instance types that are allowed by
                               the upstream nodepool definition
@@ -343,6 +349,12 @@ spec:
                               type: string
                           type: object
                         type: array
+                      allowPublicIP:
+                        description: |-
+                          Whether to add a public IP to the network interface of the underlying VM
+                          The field will be passed as is to the associatePublicIpAddress parameter of the AWS API
+                          nil value means that the default value of the AWS API will be used
+                        type: boolean
                       allowedInstanceTypes:
                         description: The AWS instance types that are allowed by the
                           upstream nodepool definition
@@ -574,6 +586,10 @@ spec:
                                   type: string
                               type: object
                             type: array
+                          allowPublicIP:
+                            description: Whether to allow public IPs for the underlying
+                              VMs
+                            type: boolean
                           imdsMaxHopCount:
                             description: Imds max hop count
                             format: int32
@@ -762,6 +778,12 @@ spec:
                                           type: string
                                       type: object
                                     type: array
+                                  allowPublicIP:
+                                    description: |-
+                                      Whether to add a public IP to the network interface of the underlying VM
+                                      The field will be passed as is to the associatePublicIpAddress parameter of the AWS API
+                                      nil value means that the default value of the AWS API will be used
+                                    type: boolean
                                   allowedInstanceTypes:
                                     description: The AWS instance types that are allowed
                                       by the upstream nodepool definition
