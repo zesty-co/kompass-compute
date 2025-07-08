@@ -15,10 +15,10 @@ spec:
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.state
+    - jsonPath: .status.protection.state
       name: State
       type: string
-    - jsonPath: .status.lastUpdatedAt
+    - jsonPath: .status.protection.lastUpdatedAt
       name: Last_Updated
       type: date
     - jsonPath: .metadata.creationTimestamp
