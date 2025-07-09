@@ -14,6 +14,18 @@ For installation instructions, configuration options, and other details, please 
 - [charts/kompass-compute](charts/kompass-compute)
 - [charts/kompass-compute-crd](charts/kompass-compute-crd)
 
+## CRDs
+
+The CRDs are provided in a separate chart and managed independently, following the [Helm best practices for CRDs](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/).
+While the CRDs are also available in the main chart, Helm installs them only during the first installation and does not upgrade or delete them during subsequent upgrades or rollbacks.
+This approach allows for independent management and upgrades of custom resources, ensuring compatibility and safe lifecycle handling when deploying or updating Kompass Compute components.
+
+**Benefits of this pattern:**
+
+- Allows CRDs to be upgraded independently of application releases, reducing risk of breaking changes.
+- Simplifies lifecycle management and supports safe, gradual adoption of new CRD versions.
+- Aligns with Helm’s recommendations for managing CRDs in production environments.
+
 ## License
 
 See the LICENSE file for licensing information.
