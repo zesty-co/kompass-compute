@@ -1036,7 +1036,7 @@ uninstaller:
 
 # qnode -- QNode specific configuration
 qnode:
-  # qnode.enabled If true, enables QNode specific features or deployments.
+  # qnode.enabled -- If true, enables QNode specific features or deployments.
   # The exact impact depends on how this is used in templates.
   enabled: true
 
@@ -1052,7 +1052,9 @@ qubexConfig:
 
   # qubexConfig.architectures -- List of supported architectures
   architectures: ~
+  # qubexConfig.infraConfig -- Infrastructure configuration
   infraConfig:
+    # qubexConfig.infraConfig.aws -- AWS specific configuration
     aws: 
       # qubexConfig.infraConfig.aws.zones -- The zones to take into account
       zones: ~
