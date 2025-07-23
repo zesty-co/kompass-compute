@@ -5,12 +5,12 @@
 #   - name: "my-registry-secret"
 imagePullSecrets: []
 
-# tag -- Override the chart name.
-# nameOverride: ""
-# Override the full name of the chart.
-# fullnameOverride: ""
+# nameOverride -- Override the chart name.
+nameOverride: ~
+# fullnameOverride -- Override the full name of the chart.
+fullnameOverride: ~
 
-# Global fallback image tag for all components.
+# tag -- Global fallback image tag for all components.
 # Used if a component's specific image.tag is not set.
 # If this is also not set (null or empty), Chart.AppVersion is used as the default.
 tag: ~
@@ -211,14 +211,14 @@ cache:
     # This prevents downtime during voluntary disruptions (e.g., node upgrades).
     enabled: true
 
-    # Minimum number/percentage of pods that must remain available during a voluntary disruption.
+    # cache.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption.
     # Cannot be used if 'maxUnavailable' is set. Example: 1 or "25%".
-    # minAvailable: 1
+    minAvailable: ~
 
-    # Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
+    # cache.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
     # Cannot be used if 'minAvailable' is set. Example: 1 or "25%".
     # If not set and PDB is enabled, defaults to 1.
-    # maxUnavailable: 1
+    maxUnavailable: ~
 
 # hiberscaler -- Hiberscaler component configuration
 hiberscaler:
@@ -557,9 +557,9 @@ otel:
     # otel.podDisruptionBudget.enabled -- If true, creates a PodDisruptionBudget for the OTEL Collector deployment.
     enabled: false
     # otel.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption.
-    # minAvailable: 1
+    minAvailable: ~
     # otel.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
-    # maxUnavailable: 1
+    maxUnavailable: ~
 
 # snapshooter -- Snapshooter component configuration
 snapshooter:
