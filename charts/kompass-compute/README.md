@@ -2,6 +2,10 @@
 
 This chart deploys the Kompass Compute components.
 
+> 🚨 <strong style="background-color: #ffa07a; color: black;"><u>Important Note</u></strong>: It's not recommended to install this chart directly, it's advised to install it as part of the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
+<br>
+The Terraform module allows automatically injecting cloud related parameters into the values.yaml of this chart.
+
 ## Prerequisites
 
 *   Kubernetes 1.19+
@@ -19,32 +23,7 @@ helm repo add zesty-kompass-compute https://zesty-co.github.io/kompass-compute
 helm repo update
 helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace zesty-system
 ```
-
-Or, if installing from a local path:
-
-```bash
-helm install kompass-compute ./helm --namespace zesty-system --create-namespace
-```
-
-## Uninstalling the Chart
-
-To uninstall/delete the `kompass-compute` deployment:
-
-```bash
-helm uninstall kompass-compute --namespace zesty-system
-```
-
-The command removes all the Kubernetes components associated with the chart and deletes the release.
-
-## Examples
-
-### Basic Installation
-
-To install the chart with default values (not typically recommended for production without reviewing defaults):
-
-```bash
-helm install kompass-compute ./helm --namespace zesty-system --create-namespace
-```
+> **Note**: To enable spot protection you need to provide the SQS queue URL in values.yaml.
 
 ### Configuring ECR Pull-Through Cache and AWS Infrastructure
 
