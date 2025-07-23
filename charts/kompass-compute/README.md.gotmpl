@@ -25,43 +25,51 @@ helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace z
 ```
 > **Note**: To enable spot protection you need to provide the SQS queue URL in values.yaml.
 
-### Configuring ECR Pull-Through Cache and AWS Infrastructure
+<br>
 
-You can provide ECR pull-through cache mappings, S3 VPC Endpoint ID, and SQS queue URL via a custom values file or `--set` arguments.
+## Advanced Configuration
 
-Create a `my-infra-values.yaml` file:
+### Configuring ECR Pull-Through Cache
+Caching the images on all Hibernated nodes can increase network costs.
 
+To reduce network costs, it's recommended to configure an ECR Pull-Through Cache and configure the nodes to pull images through it, thus only downloading each image from the internet once.
+
+First create the ECR Pull-Through Cache rules for the desired container registries, and then configure Kompass Compute to use them by confuguring values.yaml as follows:
 ```yaml
 cachePullMappings:
   dockerhub:
-    - proxyAddress: "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-dockerhub-proxy"
+    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<PROXY_NAME>"
   ghcr:
-    - proxyAddress: "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-ghcr-proxy"
+    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<PROXY_NAME>"
   # Add other registries as needed, e.g., ecr, k8s, quay
+```
 
+Additionally, since downloading from ECR is performed though S3, you should have an S3 VPC endpoint configured in your cluster and Kompass Compute should be configured to access it.
+Add the following to values.yaml:
+```yaml
 qubexConfig:
   infraConfig:
     aws:
-      spotFailuresQueueUrl: "https://sqs.us-east-1.amazonaws.com/123456789012/MyKompassSQS"
-      s3VpcEndpointID: "vpce-0abcdef1234567890"
+      s3VpcEndpointID: "vpce-..."
 ```
 
-Then install the chart:
+### Configure spot interruption monitoring
 
-```bash
-helm install kompass-compute ./helm \
-  --namespace zesty-system \
-  --create-namespace \
-  -f my-infra-values.yaml
+Kompass Compute monitors spot interruptions through an SQS queue that was created by the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
+
+To connect it to the Kubernetes components, add the following to values.yaml:
+
+```yaml
+qubexConfig:
+  infraConfig:
+    aws:
+      spotFailuresQueueUrl: "https://sqs.<REGION>.amazonaws.com/<ACCOUNT_ID>/<QUEUE_NAME>"
 ```
 
 These values are typically obtained from the output of the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
 
 ### Using IAM Roles for Service Accounts (IRSA)
-
-To configure the Kompass Compute components to use IRSA, you need to annotate their respective service accounts with the ARN of the IAM role.
-
-Create an `irsa-values.yaml` file:
+It's recomended to use EKS Pod Identity instead of IRSA, but if you perfer IRSA, you can configure it by adding the following to values.yaml:
 
 ```yaml
 # Ensure serviceAccount.create is true for each component if the chart manages them,
@@ -71,38 +79,29 @@ hiberscaler:
   serviceAccount:
     # create: true # Default is true
     annotations:
-      "eks.amazonaws.com/role-arn": "arn:aws:iam::123456789012:role/YourKompassComputeHiberscalerRole"
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
 
 imageSizeCalculator:
   serviceAccount:
     # create: true # Default is true
     annotations:
-      "eks.amazonaws.com/role-arn": "arn:aws:iam::123456789012:role/YourKompassComputeImageSizeCalculatorRole"
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
 
 snapshooter:
   serviceAccount:
     # create: true # Default is true
     annotations:
-      "eks.amazonaws.com/role-arn": "arn:aws:iam::123456789012:role/YourKompassComputeSnapshooterRole"
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
 
 telemetryManager:
   serviceAccount:
     # create: true # Default is true
     annotations:
-      "eks.amazonaws.com/role-arn": "arn:aws:iam::123456789012:role/YourKompassComputeTelemetryManagerRole"
+      "eks.amazonaws.com/role-arn": "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
 
 # If EKS Pod Identity is enabled in your cluster and you want to disable it for these pods
 # (preferring IRSA), ensure no pod identity related labels/annotations are set by default,
 # or override them if the chart provides such options.
-```
-
-Then install the chart:
-
-```bash
-helm install kompass-compute ./helm \
-  --namespace zesty-system \
-  --create-namespace \
-  -f irsa-values.yaml
 ```
 
 The IAM roles and policies should be created beforehand, for example, using the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) with `enable_irsa = true`.
