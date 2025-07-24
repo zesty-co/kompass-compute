@@ -31,13 +31,14 @@ template: ## Template all Helm charts and validate output
 		helm template test-release $$chart --debug > /dev/null || exit 1; \
 	done
 
+HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.livenessProbe\..*,.*\.podSecurityContext\..*,.*\.securityContext\..*,.*\.resources\..*,.*\.podAnnotations\..*,.*\.tolerations\..*,.*\.podDisruptionBudget\..*,qubexConfig.infraConfig"
 .PHONY: docs
 docs: ## Generate documentation from values.yaml using helm-docs for all charts
 	@echo "Generating documentation using helm-docs for all charts..."
 	@if command -v helm-docs >/dev/null 2>&1; then \
 		for chart in $(CHARTS); do \
 			echo "Generating docs for $$chart"; \
-			(cd $$chart && helm-docs); \
+			(cd $$chart && helm-docs --documentation-strict-mode --documentation-strict-ignore-absent-regex $(HELM_DOCS_IGNORE_REGEX)); \
 		done; \
 		echo "Documentation generated in README.md files"; \
 	else \
