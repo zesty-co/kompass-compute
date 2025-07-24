@@ -2,10 +2,6 @@
 
 This chart deploys the Kompass Compute components.
 
-> 🚨 <strong style="background-color: #ffa07a; color: black;"><u>Important Note</u></strong>: It's not recommended to install this chart directly, it's advised to install it as part of the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
-<br>
-The Terraform module allows automatically injecting cloud related parameters into the values.yaml of this chart.
-
 ## Prerequisites
 
 *   Kubernetes 1.19+
@@ -30,22 +26,25 @@ helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace z
 ## Advanced Configuration
 
 ### Configuring ECR Pull-Through Cache
+
 Caching the images on all Hibernated nodes can increase network costs.
 
 To reduce network costs, it's recommended to configure an ECR Pull-Through Cache and configure the nodes to pull images through it, thus only downloading each image from the internet once.
 
 First create the ECR Pull-Through Cache rules for the desired container registries, and then configure Kompass Compute to use them by confuguring values.yaml as follows:
+
 ```yaml
 cachePullMappings:
   dockerhub:
-    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<PROXY_NAME>"
+    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<DOCKER_PROXY_NAME>"
   ghcr:
-    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<PROXY_NAME>"
+    - proxyAddress: "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/<GHCR_PROXY_NAME>"
   # Add other registries as needed, e.g., ecr, k8s, quay
 ```
 
 Additionally, since downloading from ECR is performed though S3, you should have an S3 VPC endpoint configured in your cluster and Kompass Compute should be configured to access it.
 Add the following to values.yaml:
+
 ```yaml
 qubexConfig:
   infraConfig:
@@ -69,7 +68,14 @@ qubexConfig:
 These values are typically obtained from the output of the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
 
 ### Using IAM Roles for Service Accounts (IRSA)
-It's recomended to use EKS Pod Identity instead of IRSA, but if you perfer IRSA, you can configure it by adding the following to values.yaml:
+
+It's recomended to use EKS Pod Identity instead of IRSA, but if you perfer IRSA, you can configure it as follows:
+
+First make sure that you have created the necasary IAM roles and policies.
+
+These are created through the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) by specifying `enable_irsa = true` and `irsa_oidc_provider_arn=<OIDC_PROVIDER_ARN>`.
+
+Then make sure that all controllers are configured to use IRSA by adding the following to values.yaml:
 
 ```yaml
 # Ensure serviceAccount.create is true for each component if the chart manages them,
