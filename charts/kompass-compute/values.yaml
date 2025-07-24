@@ -13,7 +13,7 @@ imagePullSecrets: []
 # tag -- Global fallback image tag for all components.
 # Used if a component's specific image.tag is not set.
 # If this is also not set (null or empty), Chart.AppVersion is used as the default.
-# tag: ""
+tag: ~
 
 # logLevel -- Global log level for all components. Can be overridden per component.
 # Valid levels: "debug", "info", "warn", "error".
