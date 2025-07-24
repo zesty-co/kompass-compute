@@ -31,7 +31,7 @@ template: ## Template all Helm charts and validate output
 		helm template test-release $$chart --debug > /dev/null || exit 1; \
 	done
 
-HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.livenessProbe\..*,.*\.podSecurityContext\..*,.*\.securityContext\..*,.*\.resources\..*,.*\.podAnnotations\..*,.*\.tolerations\..*"
+HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.livenessProbe\..*,.*\.podSecurityContext\..*,.*\.securityContext\..*,.*\.resources\..*,.*\.podAnnotations\..*,.*\.tolerations\..*,.*\.podDisruptionBudget\..*,qubexConfig.infraConfig"
 .PHONY: docs
 docs: ## Generate documentation from values.yaml using helm-docs for all charts
 	@echo "Generating documentation using helm-docs for all charts..."

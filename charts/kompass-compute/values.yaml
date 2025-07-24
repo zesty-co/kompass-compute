@@ -6,14 +6,14 @@
 imagePullSecrets: []
 
 # nameOverride -- Override the chart name.
-nameOverride: ~
+# nameOverride: ""
 # fullnameOverride -- Override the full name of the chart.
-fullnameOverride: ~
+# fullnameOverride: ""
 
 # tag -- Global fallback image tag for all components.
 # Used if a component's specific image.tag is not set.
 # If this is also not set (null or empty), Chart.AppVersion is used as the default.
-tag: ~
+# tag: ""
 
 # logLevel -- Global log level for all components. Can be overridden per component.
 # Valid levels: "debug", "info", "warn", "error".
@@ -213,12 +213,12 @@ cache:
 
     # cache.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption.
     # Cannot be used if 'maxUnavailable' is set. Example: 1 or "25%".
-    minAvailable: ~
+    # minAvailable: 1
 
     # cache.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
     # Cannot be used if 'minAvailable' is set. Example: 1 or "25%".
     # If not set and PDB is enabled, defaults to 1.
-    maxUnavailable: ~
+    # maxUnavailable: 1
 
 # hiberscaler -- Hiberscaler component configuration
 hiberscaler:
@@ -379,9 +379,9 @@ hiberscaler:
     # hiberscaler.podDisruptionBudget.enabled -- If true, creates a PodDisruptionBudget for the Hiberscaler deployment.
     enabled: false
     # hiberscaler.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption.
-    minAvailable: ~
+    # minAvailable: 1
     # hiberscaler.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
-    maxUnavailable: ~
+    # maxUnavailable: 1
 
 # imageSizeCalculator -- ImageSizeCalculator component configuration
 # This component is responsible for calculating the size of container images.
@@ -557,9 +557,9 @@ otel:
     # otel.podDisruptionBudget.enabled -- If true, creates a PodDisruptionBudget for the OTEL Collector deployment.
     enabled: false
     # otel.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption.
-    minAvailable: ~
+    # minAvailable: 1
     # otel.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption.
-    maxUnavailable: ~
+    # maxUnavailable: 1
 
 # snapshooter -- Snapshooter component configuration
 snapshooter:
@@ -694,9 +694,9 @@ snapshooter:
     # snapshooter.podDisruptionBudget.enabled -- If true, creates a PodDisruptionBudget for the Snapshooter deployment
     enabled: false
     # snapshooter.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption
-    minAvailable: ~
+    # minAvailable: 1
     # snapshooter.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption
-    maxUnavailable: ~
+    # maxUnavailable: 1
 
 # telemetryManager -- Telemetry Manager component configuration
 telemetryManager:
@@ -836,9 +836,9 @@ telemetryManager:
     # telemetryManager.podDisruptionBudget.enabled -- If true, creates a PodDisruptionBudget for the Telemetry Manager deployment
     enabled: false
     # telemetryManager.podDisruptionBudget.minAvailable -- Minimum number/percentage of pods that must remain available during a voluntary disruption
-    minAvailable: ~
+    # minAvailable: 1
     # telemetryManager.podDisruptionBudget.maxUnavailable -- Maximum number/percentage of pods that can be unavailable during a voluntary disruption
-    maxUnavailable: ~
+    # maxUnavailable: 1
 
 # vector -- Vector component configuration (for log aggregation/forwarding)
 vector:
@@ -892,11 +892,11 @@ vector:
     seccompProfile:
       type: RuntimeDefault
     # vector.podSecurityContext.runAsUser -- User ID for Vector processes
-    runAsUser: ~
+    # runAsUser: 0
     # vector.podSecurityContext.runAsGroup -- Group ID for Vector processes
-    runAsGroup: ~
+    # runAsGroup: 0
     # vector.podSecurityContext.runAsNonRoot -- If true, Vector must run as a non-root user
-    runAsNonRoot: ~
+    # runAsNonRoot: false
 
   # vector.securityContext -- Security context for Vector containers
   securityContext:
@@ -1048,160 +1048,160 @@ qubexConfig:
   # The S3 bucket from which the QNode will download the Qubex assets
   # Override the node agent HTTP address prefix if you want to use a custom one.
   # Default is https://kompass-compute.s3.eu-west-1.amazonaws.com/<HIBERSCALER_TAG>
-  nodeAgentHTTPAddressPrefix: ~
+  # nodeAgentHTTPAddressPrefix: ...
 
   # qubexConfig.architectures -- List of supported architectures
-  architectures: ~
+  # architectures: [...]
   # qubexConfig.infraConfig -- Infrastructure configuration
   infraConfig:
     # qubexConfig.infraConfig.aws -- AWS specific configuration
-    aws: 
+    aws: {}
       # qubexConfig.infraConfig.aws.zones -- The zones to take into account
-      zones: ~
+      # zones: [...]
 
       # qubexConfig.infraConfig.aws.additionalTags -- Additional AWS tags added to resources created by Qubex Controllers
-      additionalTags: ~
+      # additionalTags: [...]
 
       # qubexConfig.infraConfig.aws.spotFailuresQueueUrl -- The SQS queue for spot failures events
-      spotFailuresQueueUrl: ~
+      # spotFailuresQueueUrl: ...
 
       # qubexConfig.infraConfig.aws.s3VpcEndpointID -- The ID of the S3 VPC endpoint
-      s3VpcEndpointID: ~
+      # s3VpcEndpointID: ...
 
       # qubexConfig.infraConfig.aws.s3VpcEndpointIPAddresses -- The IP addresses for S3 VPC endpoint per region
-      s3VpcEndpointIPAddresses: ~
+      # s3VpcEndpointIPAddresses: [...]
 
       # qubexConfig.infraConfig.aws.resumeVMStartInstanceBucketSize -- Bucket size used to cover for AWS API rate limit token bucket implementation
-      resumeVMStartInstanceBucketSize: ~
+      # resumeVMStartInstanceBucketSize: ...
 
       # qubexConfig.infraConfig.aws.resumeVMStartInstanceFillRate -- Bucket fill rate used to cover for AWS API rate limit token bucket implementation
-      resumeVMStartInstanceFillRate: ~
+      # resumeVMStartInstanceFillRate: ...
 
       # qubexConfig.infraConfig.aws.autodiscovery -- Whether or not to enable autodiscovery, used for preventing race conditions during uninstallation
-      autodiscovery: true
+      # autodiscovery: true
 
       # qubexConfig.infraConfig.aws.containerRuntime -- The type of container runtime to use
-      containerRuntime: ~
+      # containerRuntime: ...
 
       # qubexConfig.infraConfig.aws.enableNonTrunkingInstances -- Enable non-trunking instances
-      enableNonTrunkingInstances: ~
+      # enableNonTrunkingInstances: true
 
       # qubexConfig.infraConfig.aws.enableM7FlexInstances -- Enable m7i-flex instances
-      enableM7FlexInstances: ~
+      # enableM7FlexInstances: true
 
       # qubexConfig.infraConfig.aws.baseDiskSize -- The disk size used by Qubex VMs will be (BaseDiskSize + <instance memory size>)
-      baseDiskSize: ~
+      # baseDiskSize: ...
 
   # qubexConfig.defaultWorkloadProtectionThreshold -- The default workload protection threshold
-  defaultWorkloadProtectionThreshold: ~
+  # defaultWorkloadProtectionThreshold: ...
 
   # qubexConfig.resumingNodesRatio -- The ratio between the number of VM resumed and the number of the VMs that will be allowed to join the cluster
-  resumingNodesRatio: ~
+  # resumingNodesRatio: ...
 
   # qubexConfig.instanceTypesCount -- How many instance types should be selected for each QScaler
-  instanceTypesCount: ~
+  # instanceTypesCount: ...
 
   # qubexConfig.instanceTypeMaxCPU -- Maximum CPU for instance type
-  instanceTypeMaxCPU: ~
+  # instanceTypeMaxCPU: ...
 
   # qubexConfig.spotOceanConfig -- Spot.io Ocean integration configuration
-  spotOceanConfig:
+  spotOceanConfig: {}
     # qubexConfig.spotOceanConfig.enable -- Enable turns on Spot.io Ocean integration
-    enable: ~
+    # enable: ...
 
     # qubexConfig.spotOceanConfig.spotOceanID -- ID of the spot ocean cluster
-    spotOceanID: ~
+    # spotOceanID: ...
 
     # qubexConfig.spotOceanConfig.spotOceanSecretName -- Name of the secret containing the spot.io credentials
-    spotOceanSecretName: ~
+    # spotOceanSecretName: ...
 
     # qubexConfig.spotOceanConfig.spotOceanSecretNamespace -- Namespace of the secret containing the spot.io credentials
-    spotOceanSecretNamespace: ~
+    # spotOceanSecretNamespace: ...
 
     # qubexConfig.spotOceanConfig.spotOceanSecretTokenKey -- Key in the secret containing the spot.io token
-    spotOceanSecretTokenKey: ~
+    # spotOceanSecretTokenKey: ...
 
     # qubexConfig.spotOceanConfig.spotOceanSecretAccountKey -- Key in the secret containing the spot.io account
-    spotOceanSecretAccountKey: ~
+    # spotOceanSecretAccountKey: ...
 
   # qubexConfig.drainingConfig -- Configuration for node draining
-  drainingConfig:
+  drainingConfig: {}
     # qubexConfig.drainingConfig.scaleInProtectionDuration -- Scale in protection for Qubex VMs. Before this time elapses, machines will not be scheduled for removal
-    scaleInProtectionDuration: ~
+    # scaleInProtectionDuration: ...
 
     # qubexConfig.drainingConfig.drainGracePeriod -- The grace period of self managed drain before force termination
-    drainGracePeriod: ~
+    # drainGracePeriod: ...
 
     # qubexConfig.drainingConfig.replacementPodRetryInterval -- The time after Qubex will create another replacement pod for the same workload
-    replacementPodRetryInterval: ~
+    # replacementPodRetryInterval: ...
 
   # qubexConfig.disturbanceConfig -- Configuration for disturbance handling
-  disturbanceConfig:
+  disturbanceConfig: {}
     # qubexConfig.disturbanceConfig.cooldownPeriod -- Time to wait for disturbance to be cold before committing a disturbance event
-    cooldownPeriod: ~
+    # cooldownPeriod: ...
 
   # qubexConfig.cacheConfig -- Configuration for container image caching
   cacheConfig:
     # qubexConfig.cacheConfig.diskSize -- The disk size for container cache in GB
-    diskSize: ~
+    # diskSize: ...
 
     # qubexConfig.cacheConfig.diskFillAmount -- The amount of disk which can be filled by cached images
-    diskFillAmount: ~
+    # diskFillAmount: ...
 
     # qubexConfig.cacheConfig.additionalImages -- List of custom images which have to be cached
-    additionalImages: ~
+    # additionalImages: ...
 
     # qubexConfig.cacheConfig.revisionMinCreationInterval -- Default interval between QCache revisions creation
-    revisionMinCreationInterval: ~
+    # revisionMinCreationInterval: ...
 
     # qubexConfig.cacheConfig.workloadsPerRevisionCreation -- Number of workloads per RevisionCreation
-    workloadsPerRevisionCreation: ~
+    # workloadsPerRevisionCreation: ...
 
     # qubexConfig.cacheConfig.concurrentImagePullPerRevisionCreation -- Number of concurrent image pulls per revision creation
-    concurrentImagePullPerRevisionCreation: ~
+    # concurrentImagePullPerRevisionCreation: ...
 
     # qubexConfig.cacheConfig.concurrentLayerPullPerRevisionCreation -- Number of concurrent layers pulls per revision creation
-    concurrentLayerPullPerRevisionCreation: ~
+    # concurrentLayerPullPerRevisionCreation: ...
 
     # qubexConfig.cacheConfig.revisionCreationTimeout -- Timeout for QCacheRevisionCreation to finish
-    revisionCreationTimeout: ~
+    # revisionCreationTimeout: ...
 
     # qubexConfig.cacheConfig.workloadExpirationTime -- Old Workload expiration time
-    workloadExpirationTime: ~
+    # workloadExpirationTime: ...
 
     # qubexConfig.cacheConfig.workloadsExpirationCount -- Old Workload expiration count
-    workloadsExpirationCount: ~
+    # workloadsExpirationCount: ...
 
     # qubexConfig.cacheConfig.shardsToMergeCount -- Number of shards to merge
-    shardsToMergeCount: ~
+    # shardsToMergeCount: ...
 
     # qubexConfig.cacheConfig.acceptableLagResumeRatio -- Acceptable ratio of missing images in cache to qualify for resumption
-    acceptableLagResumeRatio: ~
+    # acceptableLagResumeRatio: ...
 
     # qubexConfig.cacheConfig.imageSizeCalculatorConfig -- Configuration for image size calculator
     imageSizeCalculatorConfig:
       # qubexConfig.cacheConfig.imageSizeCalculatorConfig.image -- Override the image size calculator image if you want to use a custom one
-      image: ~
+      # image: ...
 
       # qubexConfig.cacheConfig.imageSizeCalculatorConfig.jobNamePrefix -- Override the image size calculator job name if you want to use a custom one
-      jobNamePrefix: ~
+      # jobNamePrefix: ...
 
       # qubexConfig.cacheConfig.imageSizeCalculatorConfig.serviceAccountName -- Override the image size calculator service account name if you want to use a custom one
-      serviceAccountName: ~
+      # serviceAccountName: ...
 
       # qubexConfig.cacheConfig.imageSizeCalculatorConfig.pullSecrets -- Override the image size calculator pull secrets if you want to use a custom one
-      pullSecrets: ~
+      # pullSecrets: ...
 
   # qubexConfig.snapshooterInterval -- Snapshooter interval
-  snapshooterInterval: ~
+  # snapshooterInterval: ...
 
   # qubexConfig.enableExperimentalFeatures -- Enable experimental features
-  enableExperimentalFeatures: ~
+  # enableExperimentalFeatures: ...
 
   # qubexConfig.zestyConfig -- Zesty configuration
-  zestyConfig:
+  zestyConfig: {}
     # qubexConfig.zestyConfig.uploadInterval -- Upload interval
-    uploadInterval: ~
+    # uploadInterval: ...
 
 # cachePullMappings -- Configuration for mapping image registries to proxies/caches
 cachePullMappings: {}

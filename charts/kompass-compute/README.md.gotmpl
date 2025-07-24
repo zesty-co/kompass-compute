@@ -4,11 +4,11 @@ This chart deploys the Kompass Compute components.
 
 ## Prerequisites
 
-*   Kubernetes 1.19+
-*   Helm 3.2.0+
-*   Kompass Insight Agent installed in the cluster
-*   kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
-*   Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
+* Kubernetes 1.19+
+* Helm 3.2.0+
+* Kompass Insight Agent installed in the cluster
+* kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
+* Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
 
 ## Installing the Chart
 
@@ -19,9 +19,10 @@ helm repo add zesty-kompass-compute https://zesty-co.github.io/kompass-compute
 helm repo update
 helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace zesty-system
 ```
+
 > **Note**: To enable spot protection you need to provide the SQS queue URL in values.yaml.
 
-<br>
+&nbsp;
 
 ## Advanced Configuration
 

@@ -4,11 +4,11 @@ This chart deploys the Kompass Compute components.
 
 ## Prerequisites
 
-*   Kubernetes 1.19+
-*   Helm 3.2.0+
-*   Kompass Insight Agent installed in the cluster
-*   kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
-*   Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
+* Kubernetes 1.19+
+* Helm 3.2.0+
+* Kompass Insight Agent installed in the cluster
+* kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
+* Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
 
 ## Installing the Chart
 
@@ -19,9 +19,10 @@ helm repo add zesty-kompass-compute https://zesty-co.github.io/kompass-compute
 helm repo update
 helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace zesty-system
 ```
+
 > **Note**: To enable spot protection you need to provide the SQS queue URL in values.yaml.
 
-<br>
+&nbsp;
 
 ## Advanced Configuration
 
@@ -116,7 +117,7 @@ The IAM roles and policies should be created beforehand, for example, using the 
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| cache | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/cache-controller","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":true,"maxUnavailable":null,"minAvailable":null},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":2,"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Cache component configuration |
+| cache | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/cache-controller","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":true},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":2,"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Cache component configuration |
 | cache.affinity | object | `{}` | Affinity rules for scheduling Cache Pods. Overrides default affinity if set. See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity |
 | cache.developmentMode | string | `nil` | Enable/disable development mode for the Cache component. |
 | cache.enabled | bool | `true` | If true, deploys the Cache component. |
@@ -133,10 +134,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | cache.logRemote | string | `nil` | Enable/disable remote logging for the Cache component. |
 | cache.nodeSelector | object | `{}` | Node selector for scheduling Cache Pods. See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
 | cache.podAnnotations | object | `{"prometheus.io/port":"8080","prometheus.io/scrape":"true"}` | Annotations to add to the Cache Pods. See: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/ |
-| cache.podDisruptionBudget | object | `{"enabled":true,"maxUnavailable":null,"minAvailable":null}` | PodDisruptionBudget configuration for the Cache deployment. See: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
+| cache.podDisruptionBudget | object | `{"enabled":true}` | PodDisruptionBudget configuration for the Cache deployment. See: https://kubernetes.io/docs/tasks/run-application/configure-pdb/ |
 | cache.podDisruptionBudget.enabled | bool | `true` | If true, creates a PodDisruptionBudget for the Cache deployment. This prevents downtime during voluntary disruptions (e.g., node upgrades). |
-| cache.podDisruptionBudget.maxUnavailable | string | `nil` | Maximum number/percentage of pods that can be unavailable during a voluntary disruption. Cannot be used if 'minAvailable' is set. Example: 1 or "25%". If not set and PDB is enabled, defaults to 1. |
-| cache.podDisruptionBudget.minAvailable | string | `nil` | Minimum number/percentage of pods that must remain available during a voluntary disruption. Cannot be used if 'maxUnavailable' is set. Example: 1 or "25%". |
 | cache.podLabels | object | `{}` | Labels to add to the Cache Pods. See: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ |
 | cache.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the Cache Pods. See: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod |
 | cache.ports | object | `{"probes":{"name":"probes","port":8081}}` | Port configuration for Cache component. |
@@ -160,8 +159,7 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | cache.useDefaultAffinity | bool | `true` | If true, applies default affinity rules. Ignored if 'affinity' is set. |
 | cachePullMappings | object | `{}` | Configuration for mapping image registries to proxies/caches |
 | developmentMode | bool | `false` | Global setting for development mode features for all components. Can be overridden per component. |
-| fullnameOverride | string | `nil` | Override the full name of the chart. |
-| hiberscaler | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/hiberscaler-controller","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":false,"maxUnavailable":null,"minAvailable":null},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"metrics":{"name":"metrics","port":8080},"nodeServer":{"name":"node-server","port":8082},"probes":{"name":"probes","port":8081},"webServer":{"name":"webhook-server","port":9443,"servicePort":443,"serviceType":"ClusterIP"}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"2000m","memory":"4096Mi"},"requests":{"cpu":"2000m","memory":"4096Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Hiberscaler component configuration |
+| hiberscaler | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/hiberscaler-controller","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":false},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"metrics":{"name":"metrics","port":8080},"nodeServer":{"name":"node-server","port":8082},"probes":{"name":"probes","port":8081},"webServer":{"name":"webhook-server","port":9443,"servicePort":443,"serviceType":"ClusterIP"}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"2000m","memory":"4096Mi"},"requests":{"cpu":"2000m","memory":"4096Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Hiberscaler component configuration |
 | hiberscaler.affinity | object | `{}` | Affinity rules for scheduling Hiberscaler Pods. Overrides default affinity if set. |
 | hiberscaler.developmentMode | string | `nil` | Enable/disable development mode for the Hiberscaler component. |
 | hiberscaler.enabled | bool | `true` | If true, deploys the Hiberscaler component. |
@@ -178,10 +176,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | hiberscaler.logRemote | string | `nil` | Enable/disable remote logging for the Hiberscaler component. |
 | hiberscaler.nodeSelector | object | `{}` | Node selector for scheduling Hiberscaler Pods. |
 | hiberscaler.podAnnotations | object | `{"prometheus.io/port":"8080","prometheus.io/scrape":"true"}` | Annotations to add to the Hiberscaler Pods. |
-| hiberscaler.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":null,"minAvailable":null}` | PodDisruptionBudget configuration for the Hiberscaler deployment. |
+| hiberscaler.podDisruptionBudget | object | `{"enabled":false}` | PodDisruptionBudget configuration for the Hiberscaler deployment. |
 | hiberscaler.podDisruptionBudget.enabled | bool | `false` | If true, creates a PodDisruptionBudget for the Hiberscaler deployment. |
-| hiberscaler.podDisruptionBudget.maxUnavailable | string | `nil` | Maximum number/percentage of pods that can be unavailable during a voluntary disruption. |
-| hiberscaler.podDisruptionBudget.minAvailable | string | `nil` | Minimum number/percentage of pods that must remain available during a voluntary disruption. |
 | hiberscaler.podLabels | object | `{}` | Labels to add to the Hiberscaler Pods. |
 | hiberscaler.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the Hiberscaler Pods. |
 | hiberscaler.ports | object | `{"metrics":{"name":"metrics","port":8080},"nodeServer":{"name":"node-server","port":8082},"probes":{"name":"probes","port":8081},"webServer":{"name":"webhook-server","port":9443,"servicePort":443,"serviceType":"ClusterIP"}}` | Port configuration for the Hiberscaler component. |
@@ -232,8 +228,7 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | logLevel | string | `"info"` | Global log level for all components. Can be overridden per component. Valid levels: "debug", "info", "warn", "error". |
 | logRemote | bool | `true` | Global setting to enable/disable remote logging for all components. Can be overridden per component. |
 | monitorRemote | bool | `true` | Global setting to enable/disable remote monitoring for all components. Can be overridden per component. |
-| nameOverride | string | `nil` | Override the chart name. |
-| otel | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"gomemlimit":"400MiB","image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/otel","tag":""},"livenessProbe":{"httpGet":{"path":"/","port":"probes"},"timeoutSeconds":10},"monitorRemote":null,"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":null,"minAvailable":null},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"otlp":{"name":"otlp","port":4317},"otlpHttp":{"name":"otlp-http","port":4318},"probes":{"name":"probes","port":13133}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/","port":"probes"},"timeoutSeconds":8},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/","port":"probes"}},"tolerations":[],"useDefaultAffinity":true}` | OTEL (OpenTelemetry) Collector configuration |
+| otel | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"gomemlimit":"400MiB","image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/otel","tag":""},"livenessProbe":{"httpGet":{"path":"/","port":"probes"},"timeoutSeconds":10},"monitorRemote":null,"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"otlp":{"name":"otlp","port":4317},"otlpHttp":{"name":"otlp-http","port":4318},"probes":{"name":"probes","port":13133}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/","port":"probes"},"timeoutSeconds":8},"replicaCount":1,"resources":{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/","port":"probes"}},"tolerations":[],"useDefaultAffinity":true}` | OTEL (OpenTelemetry) Collector configuration |
 | otel.affinity | object | `{}` | Affinity rules for scheduling OTEL Collector Pods. Overrides default affinity if set. |
 | otel.developmentMode | string | `nil` | Component-specific override for global developmentMode. |
 | otel.enabled | bool | `true` | If true, deploys the OTEL Collector component. |
@@ -250,10 +245,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | otel.monitorRemote | string | `nil` | Component-specific override for global monitorRemote. |
 | otel.nodeSelector | object | `{}` | Node selector for scheduling OTEL Collector Pods. |
 | otel.podAnnotations | object | `{}` | Annotations to add to the OTEL Collector Pods. |
-| otel.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":null,"minAvailable":null}` | PodDisruptionBudget configuration for the OTEL Collector deployment. |
+| otel.podDisruptionBudget | object | `{"enabled":false}` | PodDisruptionBudget configuration for the OTEL Collector deployment. |
 | otel.podDisruptionBudget.enabled | bool | `false` | If true, creates a PodDisruptionBudget for the OTEL Collector deployment. |
-| otel.podDisruptionBudget.maxUnavailable | string | `nil` | Maximum number/percentage of pods that can be unavailable during a voluntary disruption. |
-| otel.podDisruptionBudget.minAvailable | string | `nil` | Minimum number/percentage of pods that must remain available during a voluntary disruption. |
 | otel.podLabels | object | `{}` | Labels to add to the OTEL Collector Pods. |
 | otel.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the OTEL Collector Pods. |
 | otel.ports | object | `{"otlp":{"name":"otlp","port":4317},"otlpHttp":{"name":"otlp-http","port":4318},"probes":{"name":"probes","port":13133}}` | Port configuration for the OTEL Collector. |
@@ -282,64 +275,16 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | otel.useDefaultAffinity | bool | `true` | If true, applies default affinity rules. Ignored if 'affinity' is set. |
 | qnode | object | `{"enabled":true}` | QNode specific configuration |
 | qnode.enabled | bool | `true` | If true, enables QNode specific features or deployments. The exact impact depends on how this is used in templates. |
-| qubexConfig | object | `{"architectures":null,"cacheConfig":{"acceptableLagResumeRatio":null,"additionalImages":null,"concurrentImagePullPerRevisionCreation":null,"concurrentLayerPullPerRevisionCreation":null,"diskFillAmount":null,"diskSize":null,"imageSizeCalculatorConfig":{"image":null,"jobNamePrefix":null,"pullSecrets":null,"serviceAccountName":null},"revisionCreationTimeout":null,"revisionMinCreationInterval":null,"shardsToMergeCount":null,"workloadExpirationTime":null,"workloadsExpirationCount":null,"workloadsPerRevisionCreation":null},"cloudProvider":"eks","defaultWorkloadProtectionThreshold":null,"disturbanceConfig":{"cooldownPeriod":null},"drainingConfig":{"drainGracePeriod":null,"replacementPodRetryInterval":null,"scaleInProtectionDuration":null},"enableExperimentalFeatures":null,"infraConfig":{"aws":{"additionalTags":null,"autodiscovery":true,"baseDiskSize":null,"containerRuntime":null,"enableM7FlexInstances":null,"enableNonTrunkingInstances":null,"resumeVMStartInstanceBucketSize":null,"resumeVMStartInstanceFillRate":null,"s3VpcEndpointID":null,"s3VpcEndpointIPAddresses":null,"spotFailuresQueueUrl":null,"zones":null}},"instanceTypeMaxCPU":null,"instanceTypesCount":null,"nodeAgentHTTPAddressPrefix":null,"resumingNodesRatio":null,"snapshooterInterval":null,"spotOceanConfig":{"enable":null,"spotOceanID":null,"spotOceanSecretAccountKey":null,"spotOceanSecretName":null,"spotOceanSecretNamespace":null,"spotOceanSecretTokenKey":null},"zestyConfig":{"uploadInterval":null}}` | QubexConfig |
-| qubexConfig.architectures | string | `nil` | List of supported architectures |
-| qubexConfig.cacheConfig | object | `{"acceptableLagResumeRatio":null,"additionalImages":null,"concurrentImagePullPerRevisionCreation":null,"concurrentLayerPullPerRevisionCreation":null,"diskFillAmount":null,"diskSize":null,"imageSizeCalculatorConfig":{"image":null,"jobNamePrefix":null,"pullSecrets":null,"serviceAccountName":null},"revisionCreationTimeout":null,"revisionMinCreationInterval":null,"shardsToMergeCount":null,"workloadExpirationTime":null,"workloadsExpirationCount":null,"workloadsPerRevisionCreation":null}` | Configuration for container image caching |
-| qubexConfig.cacheConfig.acceptableLagResumeRatio | string | `nil` | Acceptable ratio of missing images in cache to qualify for resumption |
-| qubexConfig.cacheConfig.additionalImages | string | `nil` | List of custom images which have to be cached |
-| qubexConfig.cacheConfig.concurrentImagePullPerRevisionCreation | string | `nil` | Number of concurrent image pulls per revision creation |
-| qubexConfig.cacheConfig.concurrentLayerPullPerRevisionCreation | string | `nil` | Number of concurrent layers pulls per revision creation |
-| qubexConfig.cacheConfig.diskFillAmount | string | `nil` | The amount of disk which can be filled by cached images |
-| qubexConfig.cacheConfig.diskSize | string | `nil` | The disk size for container cache in GB |
-| qubexConfig.cacheConfig.imageSizeCalculatorConfig | object | `{"image":null,"jobNamePrefix":null,"pullSecrets":null,"serviceAccountName":null}` | Configuration for image size calculator |
-| qubexConfig.cacheConfig.imageSizeCalculatorConfig.image | string | `nil` | Override the image size calculator image if you want to use a custom one |
-| qubexConfig.cacheConfig.imageSizeCalculatorConfig.jobNamePrefix | string | `nil` | Override the image size calculator job name if you want to use a custom one |
-| qubexConfig.cacheConfig.imageSizeCalculatorConfig.pullSecrets | string | `nil` | Override the image size calculator pull secrets if you want to use a custom one |
-| qubexConfig.cacheConfig.imageSizeCalculatorConfig.serviceAccountName | string | `nil` | Override the image size calculator service account name if you want to use a custom one |
-| qubexConfig.cacheConfig.revisionCreationTimeout | string | `nil` | Timeout for QCacheRevisionCreation to finish |
-| qubexConfig.cacheConfig.revisionMinCreationInterval | string | `nil` | Default interval between QCache revisions creation |
-| qubexConfig.cacheConfig.shardsToMergeCount | string | `nil` | Number of shards to merge |
-| qubexConfig.cacheConfig.workloadExpirationTime | string | `nil` | Old Workload expiration time |
-| qubexConfig.cacheConfig.workloadsExpirationCount | string | `nil` | Old Workload expiration count |
-| qubexConfig.cacheConfig.workloadsPerRevisionCreation | string | `nil` | Number of workloads per RevisionCreation |
+| qubexConfig | object | `{"cacheConfig":{"imageSizeCalculatorConfig":null},"cloudProvider":"eks","disturbanceConfig":{},"drainingConfig":{},"infraConfig":{"aws":{}},"spotOceanConfig":{},"zestyConfig":{}}` | QubexConfig |
+| qubexConfig.cacheConfig | object | `{"imageSizeCalculatorConfig":null}` | Configuration for container image caching |
+| qubexConfig.cacheConfig.imageSizeCalculatorConfig | string | `nil` | Configuration for image size calculator |
 | qubexConfig.cloudProvider | string | `"eks"` | The cloud provider |
-| qubexConfig.defaultWorkloadProtectionThreshold | string | `nil` | The default workload protection threshold |
-| qubexConfig.disturbanceConfig | object | `{"cooldownPeriod":null}` | Configuration for disturbance handling |
-| qubexConfig.disturbanceConfig.cooldownPeriod | string | `nil` | Time to wait for disturbance to be cold before committing a disturbance event |
-| qubexConfig.drainingConfig | object | `{"drainGracePeriod":null,"replacementPodRetryInterval":null,"scaleInProtectionDuration":null}` | Configuration for node draining |
-| qubexConfig.drainingConfig.drainGracePeriod | string | `nil` | The grace period of self managed drain before force termination |
-| qubexConfig.drainingConfig.replacementPodRetryInterval | string | `nil` | The time after Qubex will create another replacement pod for the same workload |
-| qubexConfig.drainingConfig.scaleInProtectionDuration | string | `nil` | Scale in protection for Qubex VMs. Before this time elapses, machines will not be scheduled for removal |
-| qubexConfig.enableExperimentalFeatures | string | `nil` | Enable experimental features |
-| qubexConfig.infraConfig | object | `{"aws":{"additionalTags":null,"autodiscovery":true,"baseDiskSize":null,"containerRuntime":null,"enableM7FlexInstances":null,"enableNonTrunkingInstances":null,"resumeVMStartInstanceBucketSize":null,"resumeVMStartInstanceFillRate":null,"s3VpcEndpointID":null,"s3VpcEndpointIPAddresses":null,"spotFailuresQueueUrl":null,"zones":null}}` | Infrastructure configuration |
-| qubexConfig.infraConfig.aws | object | `{"additionalTags":null,"autodiscovery":true,"baseDiskSize":null,"containerRuntime":null,"enableM7FlexInstances":null,"enableNonTrunkingInstances":null,"resumeVMStartInstanceBucketSize":null,"resumeVMStartInstanceFillRate":null,"s3VpcEndpointID":null,"s3VpcEndpointIPAddresses":null,"spotFailuresQueueUrl":null,"zones":null}` | AWS specific configuration |
-| qubexConfig.infraConfig.aws.additionalTags | string | `nil` | Additional AWS tags added to resources created by Qubex Controllers |
-| qubexConfig.infraConfig.aws.autodiscovery | bool | `true` | Whether or not to enable autodiscovery, used for preventing race conditions during uninstallation |
-| qubexConfig.infraConfig.aws.baseDiskSize | string | `nil` | The disk size used by Qubex VMs will be (BaseDiskSize + <instance memory size>) |
-| qubexConfig.infraConfig.aws.containerRuntime | string | `nil` | The type of container runtime to use |
-| qubexConfig.infraConfig.aws.enableM7FlexInstances | string | `nil` | Enable m7i-flex instances |
-| qubexConfig.infraConfig.aws.enableNonTrunkingInstances | string | `nil` | Enable non-trunking instances |
-| qubexConfig.infraConfig.aws.resumeVMStartInstanceBucketSize | string | `nil` | Bucket size used to cover for AWS API rate limit token bucket implementation |
-| qubexConfig.infraConfig.aws.resumeVMStartInstanceFillRate | string | `nil` | Bucket fill rate used to cover for AWS API rate limit token bucket implementation |
-| qubexConfig.infraConfig.aws.s3VpcEndpointID | string | `nil` | The ID of the S3 VPC endpoint |
-| qubexConfig.infraConfig.aws.s3VpcEndpointIPAddresses | string | `nil` | The IP addresses for S3 VPC endpoint per region |
-| qubexConfig.infraConfig.aws.spotFailuresQueueUrl | string | `nil` | The SQS queue for spot failures events |
-| qubexConfig.infraConfig.aws.zones | string | `nil` | The zones to take into account |
-| qubexConfig.instanceTypeMaxCPU | string | `nil` | Maximum CPU for instance type |
-| qubexConfig.instanceTypesCount | string | `nil` | How many instance types should be selected for each QScaler |
-| qubexConfig.nodeAgentHTTPAddressPrefix | string | `nil` | Path to NodeAgent HTTP address prefix The S3 bucket from which the QNode will download the Qubex assets Override the node agent HTTP address prefix if you want to use a custom one. Default is https://kompass-compute.s3.eu-west-1.amazonaws.com/<HIBERSCALER_TAG> |
-| qubexConfig.resumingNodesRatio | string | `nil` | The ratio between the number of VM resumed and the number of the VMs that will be allowed to join the cluster |
-| qubexConfig.snapshooterInterval | string | `nil` | Snapshooter interval |
-| qubexConfig.spotOceanConfig | object | `{"enable":null,"spotOceanID":null,"spotOceanSecretAccountKey":null,"spotOceanSecretName":null,"spotOceanSecretNamespace":null,"spotOceanSecretTokenKey":null}` | Spot.io Ocean integration configuration |
-| qubexConfig.spotOceanConfig.enable | string | `nil` | Enable turns on Spot.io Ocean integration |
-| qubexConfig.spotOceanConfig.spotOceanID | string | `nil` | ID of the spot ocean cluster |
-| qubexConfig.spotOceanConfig.spotOceanSecretAccountKey | string | `nil` | Key in the secret containing the spot.io account |
-| qubexConfig.spotOceanConfig.spotOceanSecretName | string | `nil` | Name of the secret containing the spot.io credentials |
-| qubexConfig.spotOceanConfig.spotOceanSecretNamespace | string | `nil` | Namespace of the secret containing the spot.io credentials |
-| qubexConfig.spotOceanConfig.spotOceanSecretTokenKey | string | `nil` | Key in the secret containing the spot.io token |
-| qubexConfig.zestyConfig | object | `{"uploadInterval":null}` | Zesty configuration |
-| qubexConfig.zestyConfig.uploadInterval | string | `nil` | Upload interval |
-| snapshooter | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/snapshooter","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false,"maxUnavailable":null,"minAvailable":null},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"300m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"terminationGracePeriodSeconds":60,"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Snapshooter component configuration |
+| qubexConfig.disturbanceConfig | object | `{}` | Configuration for disturbance handling |
+| qubexConfig.drainingConfig | object | `{}` | Configuration for node draining |
+| qubexConfig.infraConfig.aws | object | `{}` | AWS specific configuration |
+| qubexConfig.spotOceanConfig | object | `{}` | Spot.io Ocean integration configuration |
+| qubexConfig.zestyConfig | object | `{}` | Zesty configuration |
+| snapshooter | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/snapshooter","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"300m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"terminationGracePeriodSeconds":60,"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Snapshooter component configuration |
 | snapshooter.affinity | object | `{}` | Affinity rules for scheduling Snapshooter pods. Overrides default affinity if set |
 | snapshooter.developmentMode | string | `nil` | Component-specific override for global development mode |
 | snapshooter.enabled | bool | `true` | If true, deploys the Snapshooter component |
@@ -356,10 +301,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | snapshooter.logRemote | string | `nil` | Component-specific override for global remote logging configuration |
 | snapshooter.nodeSelector | object | `{}` | Node selector for scheduling Snapshooter pods |
 | snapshooter.podAnnotations | object | `{}` | Annotations to add to the Snapshooter pods |
-| snapshooter.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":null,"minAvailable":null}` | PodDisruptionBudget configuration for the Snapshooter deployment |
+| snapshooter.podDisruptionBudget | object | `{"enabled":false}` | PodDisruptionBudget configuration for the Snapshooter deployment |
 | snapshooter.podDisruptionBudget.enabled | bool | `false` | If true, creates a PodDisruptionBudget for the Snapshooter deployment |
-| snapshooter.podDisruptionBudget.maxUnavailable | string | `nil` | Maximum number/percentage of pods that can be unavailable during a voluntary disruption |
-| snapshooter.podDisruptionBudget.minAvailable | string | `nil` | Minimum number/percentage of pods that must remain available during a voluntary disruption |
 | snapshooter.podLabels | object | `{}` | Labels to add to the Snapshooter pods |
 | snapshooter.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the Snapshooter pod |
 | snapshooter.ports | object | `{"probes":{"name":"probes","port":8081}}` | Port configuration for the Snapshooter component |
@@ -382,8 +325,7 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | snapshooter.tolerations | list | `[]` | Tolerations for scheduling Snapshooter pods |
 | snapshooter.traceRemote | string | `nil` | Component-specific override for global remote tracing configuration |
 | snapshooter.useDefaultAffinity | bool | `true` | If true, applies default affinity rules. Ignored if 'affinity' is set |
-| tag | string | `nil` | Global fallback image tag for all components. Used if a component's specific image.tag is not set. If this is also not set (null or empty), Chart.AppVersion is used as the default. |
-| telemetryManager | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/telemetry-manager","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":false,"maxUnavailable":null,"minAvailable":null},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"metrics":{"name":"metrics","port":8080},"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"400m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Telemetry Manager component configuration |
+| telemetryManager | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/telemetry-manager","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{"prometheus.io/port":"8080","prometheus.io/scrape":"true"},"podDisruptionBudget":{"enabled":false},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"metrics":{"name":"metrics","port":8080},"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"400m","memory":"512Mi"},"requests":{"cpu":"200m","memory":"256Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Telemetry Manager component configuration |
 | telemetryManager.affinity | object | `{}` | Affinity rules for scheduling Telemetry Manager pods. Overrides default affinity if set |
 | telemetryManager.developmentMode | string | `nil` | Component-specific override for global development mode |
 | telemetryManager.enabled | bool | `true` | If true, deploys the Telemetry Manager component |
@@ -400,10 +342,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | telemetryManager.logRemote | string | `nil` | Component-specific override for global log remote endpoint |
 | telemetryManager.nodeSelector | object | `{}` | Node selector for scheduling Telemetry Manager pods |
 | telemetryManager.podAnnotations | object | `{"prometheus.io/port":"8080","prometheus.io/scrape":"true"}` | Annotations to add to the Telemetry Manager Pods |
-| telemetryManager.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":null,"minAvailable":null}` | PodDisruptionBudget configuration for the Telemetry Manager deployment |
+| telemetryManager.podDisruptionBudget | object | `{"enabled":false}` | PodDisruptionBudget configuration for the Telemetry Manager deployment |
 | telemetryManager.podDisruptionBudget.enabled | bool | `false` | If true, creates a PodDisruptionBudget for the Telemetry Manager deployment |
-| telemetryManager.podDisruptionBudget.maxUnavailable | string | `nil` | Maximum number/percentage of pods that can be unavailable during a voluntary disruption |
-| telemetryManager.podDisruptionBudget.minAvailable | string | `nil` | Minimum number/percentage of pods that must remain available during a voluntary disruption |
 | telemetryManager.podLabels | object | `{}` | Additional labels to add to the Telemetry Manager Pods |
 | telemetryManager.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for the Telemetry Manager pods |
 | telemetryManager.ports | object | `{"metrics":{"name":"metrics","port":8080},"probes":{"name":"probes","port":8081}}` | Port configuration for the Telemetry Manager component |
@@ -458,7 +398,7 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | uninstaller.serviceAccount.name | string | `""` | The name of the ServiceAccount to use |
 | uninstaller.tolerations | list | `[]` | Tolerations for scheduling Uninstaller Pod |
 | uninstaller.traceRemote | string | `nil` | Component-specific override for global remote tracing |
-| vector | object | `{"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/vector","tag":""},"logLevel":null,"normal":{"affinity":{},"nodeSelector":{},"tolerations":[{"operator":"Exists"}],"useDefaultAffinity":true},"podAnnotations":{},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":null,"runAsNonRoot":null,"runAsUser":null,"seccompProfile":{"type":"RuntimeDefault"}},"qNode":{"affinity":{},"nodeSelector":{},"tolerations":[{"operator":"Exists"}],"useDefaultAffinity":true},"rbac":{"create":true},"resources":{"limits":{"cpu":"300m","memory":"600Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""}}` | Vector component configuration (for log aggregation/forwarding) |
+| vector | object | `{"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/vector","tag":""},"logLevel":null,"normal":{"affinity":{},"nodeSelector":{},"tolerations":[{"operator":"Exists"}],"useDefaultAffinity":true},"podAnnotations":{},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"seccompProfile":{"type":"RuntimeDefault"}},"qNode":{"affinity":{},"nodeSelector":{},"tolerations":[{"operator":"Exists"}],"useDefaultAffinity":true},"rbac":{"create":true},"resources":{"limits":{"cpu":"300m","memory":"600Mi"},"requests":{"cpu":"10m","memory":"50Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""}}` | Vector component configuration (for log aggregation/forwarding) |
 | vector.developmentMode | string | `nil` | Component-specific override for global development mode |
 | vector.enabled | bool | `true` | If true, deploys the Vector component (typically as a DaemonSet) |
 | vector.extraArgs | list | `[]` | Additional command line arguments for the Vector container |
@@ -477,11 +417,8 @@ The IAM roles and policies should be created beforehand, for example, using the 
 | vector.normal.useDefaultAffinity | bool | `true` | If true, applies default affinity rules. Ignored if 'affinity' is set |
 | vector.podAnnotations | object | `{}` | Annotations to add to the Vector Pods |
 | vector.podLabels | object | `{}` | Additional labels to add to the Vector Pods |
-| vector.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":null,"runAsNonRoot":null,"runAsUser":null,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for Vector Pods |
+| vector.podSecurityContext | object | `{"fsGroup":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for Vector Pods |
 | vector.podSecurityContext.fsGroup | int | `1000` | Group ID for the filesystem used by Vector |
-| vector.podSecurityContext.runAsGroup | string | `nil` | Group ID for Vector processes |
-| vector.podSecurityContext.runAsNonRoot | string | `nil` | If true, Vector must run as a non-root user |
-| vector.podSecurityContext.runAsUser | string | `nil` | User ID for Vector processes |
 | vector.qNode | object | `{"affinity":{},"nodeSelector":{},"tolerations":[{"operator":"Exists"}],"useDefaultAffinity":true}` | Configuration for Vector running on QNode (Qubex specific nodes) |
 | vector.qNode.affinity | object | `{}` | Affinity settings for Vector pods on QNodes |
 | vector.qNode.nodeSelector | object | `{}` | Node selector for Vector pods on QNodes |
