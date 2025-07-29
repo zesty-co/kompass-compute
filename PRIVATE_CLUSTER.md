@@ -142,29 +142,25 @@ The S3 VPC gateway endpoint allows private communication to S3 by mapping the pu
     value: "https://<AUTOSCALING_PRIVATE_ENDPOINT_DNS_NAME>"
   ```
 
-## Kompass Compute Configuration:
+## Kompass Insight and Kompass Compute Configuration:
 
-Disable remote logging, tracing and monitoring:
+Kompass Insight needs to be deployed with private Coralogix endpoint setup:
 
 ```yaml
-logRemote: false
-traceRemote: false
-monitorRemote: false
-
-otel:
-  enabled: false
-
-vector:
-  enabled: false
+cxLogging:
+  enabled: true
+  domain: "private.eu2.coralogix.com"
+  logUrl: "https://ingress.private.eu2.coralogix.com:443/api/v1/logs"
+  timeDeltaUrl: "https://ingress.private.eu2.coralogix.com:443/sdk/v1/time"
+  ingressLogsUrl: "https://ingress.private.eu2.coralogix.com/logs/v1/singles"
+  ingressUrl: "https://ingress.private.eu2.coralogix.com"
 ```
 
-Full example when using private endpoints with "private DNS names":
+Next step is to deploy Kompass Compute in the same EKS cluster as Insight.
+If the "private DNS names" option is used, there is no additional configuration required.
+If the "private DNS names" option is disabled, you have to provide the following environment variables:
 
 ```yaml
-logRemote: false
-traceRemote: false
-monitorRemote: false
-
 hiberscaler:
   extraEnv:
     - name: "AWS_ENDPOINT_URL_IAM"
@@ -187,19 +183,13 @@ imageSizeCalculator:
     - name: "AWS_ENDPOINT_URL_STS"
       value: "https://<STS_PRIVATE_ENDPOINT_DNS_NAME>"
 
-"snapshooter":
+snapshooter:
   extraEnv:
     - name: "AWS_ENDPOINT_URL_STS"
       value: "https://<STS_PRIVATE_ENDPOINT_DNS_NAME>"
 
-"telemetryManager":
+telemetryManager:
   extraEnv:
     - name: "AWS_ENDPOINT_URL_STS"
       value: "https://<STS_PRIVATE_ENDPOINT_DNS_NAME>"
-
-otel:
-  enabled: false
-
-vector:
-  enabled: false
 ```
