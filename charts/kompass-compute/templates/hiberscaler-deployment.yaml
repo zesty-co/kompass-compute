@@ -23,6 +23,14 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: {{ include "kompass-compute.hiberscaler.name" . }}
+                  app.kubernetes.io/name: {{ include "kompass-compute.hiberscaler.name" . }}
+              topologyKey: kubernetes.io/hostname
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

@@ -226,7 +226,7 @@ hiberscaler:
   enabled: true
 
   # hiberscaler.replicaCount -- Number of replicas for the Hiberscaler Deployment.
-  replicaCount: 1
+  replicaCount: 3
 
   # hiberscaler.image -- Image configuration for the Hiberscaler component.
   image:
