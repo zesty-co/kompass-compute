@@ -423,6 +423,40 @@ imageSizeCalculator:
   # Note: Other common deployment parameters (replicaCount, probes, etc.) might not be applicable
   # if this component runs as a Job. Refer to its specific templates.
 
+  # imageSizeCalculator.podAnnotations -- Annotations to add to the ImageSizeCalculator Pods.
+  podAnnotations: {}
+  # imageSizeCalculator.podLabels -- Labels to add to the ImageSizeCalculator Pods.
+  podLabels: {}
+
+  # imageSizeCalculator.podSecurityContext -- Security context for the ImageSizeCalculator Pods. It requires root to run.
+  podSecurityContext: {}
+
+  # imageSizeCalculator.securityContext -- Security context for the ImageSizeCalculator containers.
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+#    readOnlyRootFilesystem: true
+
+  # imageSizeCalculator.resources -- Resource requests and limits for the ImageSizeCalculator Pods.
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 1024Mi
+    requests:
+      cpu: 1000m
+      memory: 512Mi
+
+  # imageSizeCalculator.nodeSelector -- Node selector for scheduling ImageSizeCalculator Pods.
+  nodeSelector: {}
+  # imageSizeCalculator.tolerations -- Tolerations for scheduling ImageSizeCalculator Pods.
+  tolerations: []
+  # imageSizeCalculator.affinity -- Affinity rules for scheduling ImageSizeCalculator Pods. Overrides default affinity if set.
+  affinity: {}
+  # imageSizeCalculator.useDefaultAffinity -- If true, applies default affinity (e.g., anti-affinity with other ImageSizeCalculator pods on the same node if applicable).
+  useDefaultAffinity: false
+
 # otel -- OTEL (OpenTelemetry) Collector configuration
 otel:
   # otel.enabled -- If true, deploys the OTEL Collector component.

@@ -189,7 +189,7 @@ Creates default affinity rules for Cache.
 Component: Cache
 */}}
 {{- define "kompass-compute.cache.affinity" -}}
-{{ include "kompass-compute.affinity" (dict "affinity" .Values.cache.affinity "useDefaultAffinity" .Values.cache.useDefaultAffinity "name" "cache" "component" "controller") -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.cache.affinity "useDefaultAffinity" .Values.cache.useDefaultAffinity "name" (include "kompass-compute.cache.shortName" .) "component" "controller") -}}
 {{- end }}
 
 {{/*
@@ -278,7 +278,7 @@ Creates default affinity rules for Hiberscaler.
 Component: Hiberscaler
 */}}
 {{- define "kompass-compute.hiberscaler.affinity" -}}
-{{ include "kompass-compute.affinity" (dict "affinity" .Values.hiberscaler.affinity "useDefaultAffinity" .Values.hiberscaler.useDefaultAffinity "name" "hiberscaler" "component" "controller") -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.hiberscaler.affinity "useDefaultAffinity" .Values.hiberscaler.useDefaultAffinity "name" (include "kompass-compute.hiberscaler.shortName" .) "component" "controller") -}}
 {{- end }}
 
 {{/*
@@ -344,6 +344,15 @@ Component: ImageSizeCalculator
 {{- default "default" .Values.imageSizeCalculator.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Creates default affinity rules for ImageSizeCalculator.
+Component: ImageSizeCalculator
+*/}}
+{{- define "kompass-compute.imageSizeCalculator.affinity" -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.imageSizeCalculator.affinity "useDefaultAffinity" .Values.imageSizeCalculator.useDefaultAffinity "name" (include "kompass-compute.imageSizeCalculator.shortName" .) "component" "controller") -}}
+{{- end }}
+
 
 {{/*
 Creates the short name of the OTEL controller.
@@ -415,7 +424,7 @@ Creates default affinity rules for OTEL.
 Component: OTEL
 */}}
 {{- define "kompass-compute.otel.affinity" -}}
-{{ include "kompass-compute.affinity" (dict "affinity" .Values.otel.affinity "useDefaultAffinity" .Values.otel.useDefaultAffinity "name" "otel" "component" "monitoring") -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.otel.affinity "useDefaultAffinity" .Values.otel.useDefaultAffinity "name" (include "kompass-compute.otel.shortName" .) "component" "monitoring") -}}
 {{- end }}
 
 {{/*
@@ -508,7 +517,7 @@ Creates default affinity rules for Snapshooter.
 Component: Snapshooter
 */}}
 {{- define "kompass-compute.snapshooter.affinity" -}}
-{{ include "kompass-compute.affinity" (dict "affinity" .Values.snapshooter.affinity "useDefaultAffinity" .Values.snapshooter.useDefaultAffinity "name" "snapshooter" "component" "monitoring") -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.snapshooter.affinity "useDefaultAffinity" .Values.snapshooter.useDefaultAffinity "name" (include "kompass-compute.snapshooter.shortName" .) "component" "monitoring") -}}
 {{- end }}
 
 {{/*
@@ -580,7 +589,7 @@ Creates default affinity rules for TelemetryManager.
 Component: TelemetryManager
 */}}
 {{- define "kompass-compute.telemetryManager.affinity" -}}
-{{ include "kompass-compute.affinity" (dict "affinity" .Values.telemetryManager.affinity "useDefaultAffinity" .Values.telemetryManager.useDefaultAffinity "name" "telemetry-manager" "component" "monitoring") -}}
+{{ include "kompass-compute.affinity" (dict "affinity" .Values.telemetryManager.affinity "useDefaultAffinity" .Values.telemetryManager.useDefaultAffinity "name" (include "kompass-compute.telemetryManager.shortName" .) "component" "monitoring") -}}
 {{- end }}
 
 {{/*
@@ -881,8 +890,16 @@ Component: QubexConfig
     "imageSizeCalculatorConfig" (dict
         "image" (include "kompass-compute.imageSizeCalculator.image" .)
         "serviceAccountName" (include "kompass-compute.imageSizeCalculator.serviceAccountName" .)
+        "labels" ((include "kompass-compute.imageSizeCalculator.labels" . | default "{}") | fromYaml | merge (.Values.imageSizeCalculator.podLabels | default dict))
+        "annotations" (.Values.imageSizeCalculator.podAnnotations | default dict)
         "pullSecrets" (.Values.imagePullSecrets | default list )
         "extraEnv" (.Values.imageSizeCalculator.extraEnv | default list )
+        "podSecurityContext" (.Values.imageSizeCalculator.podSecurityContext | default dict)
+        "securityContext" (.Values.imageSizeCalculator.securityContext | default dict)
+        "resources" (.Values.imageSizeCalculator.resources | default dict)
+        "nodeSelector" (.Values.imageSizeCalculator.nodeSelector | default dict)
+        "tolerations" (.Values.imageSizeCalculator.tolerations | default list )
+        "affinity" (get ((include "kompass-compute.imageSizeCalculator.affinity" . | default "affinity: {}") | fromYaml) "affinity")
     )
 )
 -}}
