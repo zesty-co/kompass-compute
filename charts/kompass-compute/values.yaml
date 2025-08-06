@@ -21,7 +21,7 @@ logLevel: "info"
 # logRemote -- Global setting to enable/disable remote logging for all components. Can be overridden per component.
 logRemote: true
 # traceRemote -- Global setting to enable/disable remote tracing for all components. Can be overridden per component.
-traceRemote: true
+traceRemote: false
 # monitorRemote -- Global setting to enable/disable remote monitoring for all components. Can be overridden per component.
 monitorRemote: true
 # developmentMode -- Global setting for development mode features for all components. Can be overridden per component.
