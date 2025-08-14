@@ -6,7 +6,7 @@ This chart deploys the Kompass Compute components.
 
 * Kubernetes 1.19+
 * Helm 3.2.0+
-* Kompass Insight Agent installed in the cluster
+* Kompass Insight Agent installed in the cluster - zz
 * kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
 * Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
 
