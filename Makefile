@@ -25,6 +25,10 @@ template: ## Template all Helm charts and validate output
 		helm template test-release $$chart --debug > /dev/null || exit 1; \
 	done
 
+.PHONY: ensure-template-var-prefix
+ensure-template-var-prefix: ## Ensure all template variables start with "kompass-core."
+	@sh hack/ensure-template-var-prefix.sh
+
 HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.livenessProbe\..*,.*\.podSecurityContext\..*,.*\.securityContext\..*,.*\.resources\..*,.*\.podAnnotations\..*,.*\.tolerations\..*,.*\.podDisruptionBudget\..*,qubexConfig.infraConfig"
 .PHONY: docs
 docs: ## Generate documentation from values.yaml using helm-docs for all charts
