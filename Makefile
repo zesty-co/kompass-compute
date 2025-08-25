@@ -25,14 +25,15 @@ template: ## Template all Helm charts and validate output
 		helm template test-release $$chart --debug > /dev/null || exit 1; \
 	done
 
+TEMPLATE_PREFIX := kompass-compute
 .PHONY: ensure-template-var-prefix
-ensure-template-var-prefix: ## Ensure all template variables start with "kompass-core."
+ensure-template-var-prefix: ## Ensure all template variables start with "$(TEMPLATE_PREFIX)."
 	@problem_keys=$$(find . -type f -name '*.tpl' \
 		| xargs grep -Eo '{{-?[[:space:]]*define[[:space:]]*"[^"]+"' \
 		| sed -E 's/.*define[[:space:]]*"([^"]+)".*/\1/' \
-		| grep -v '^kompass-compute\.'); \
+		| grep -v '^$(TEMPLATE_PREFIX)\.'); \
 	if [ -n "$$problem_keys" ]; then \
-		echo "Some template variables do not start with 'kompass-compute.' prefix."; \
+		echo "Some template variables do not start with '$(TEMPLATE_PREFIX).' prefix."; \
 		echo "$$problem_keys"; \
 		exit 1; \
 	fi
