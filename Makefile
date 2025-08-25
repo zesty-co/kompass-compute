@@ -7,7 +7,7 @@ SHELL := /bin/bash
 CHARTS := charts/kompass-compute charts/kompass-compute-crd
 
 .PHONY: all
-all: lint template docs ## Run all operations: lint, template and docs
+all: lint ensure-template-var-prefix template docs ## Run all operations that validate the correctness and generate assets
 
 .PHONY: lint
 lint: ## Lint all Helm charts
@@ -27,7 +27,15 @@ template: ## Template all Helm charts and validate output
 
 .PHONY: ensure-template-var-prefix
 ensure-template-var-prefix: ## Ensure all template variables start with "kompass-core."
-	@sh hack/ensure-template-var-prefix.sh
+	@problem_keys=$$(find . -type f -name '*.tpl' \
+		| xargs grep -Eo '{{-?[[:space:]]*define[[:space:]]*"[^"]+"' \
+		| sed -E 's/.*define[[:space:]]*"([^"]+)".*/\1/' \
+		| grep -v '^kompass-compute\.'); \
+	if [ -n "$$problem_keys" ]; then \
+		echo "Some template variables do not start with 'kompass-compute.' prefix."; \
+		echo "$$problem_keys"; \
+		exit 1; \
+	fi
 
 HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.livenessProbe\..*,.*\.podSecurityContext\..*,.*\.securityContext\..*,.*\.resources\..*,.*\.podAnnotations\..*,.*\.tolerations\..*,.*\.podDisruptionBudget\..*,qubexConfig.infraConfig"
 .PHONY: docs
