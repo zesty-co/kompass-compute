@@ -1,15 +1,15 @@
 # Kompass Compute CRD Helm Chart
 
-This chart deploys the Kompass Compute CRDs.
+This chart deploys the Kompass Compute CRD components.
 
 ## Prerequisites
 
-*   Kubernetes 1.19+
-*   Helm 3.2.0+
+-   Kubernetes v1.19, or later
+-   Helm v3.2.0, or later
 
-## Installing the Chart
+## Install the chart
 
-To install the chart with the release name `kompass-compute`:
+The following example shows how to install the chart with the release name, `kompass-compute`:
 
 ```bash
 helm repo add zesty-kompass-compute https://zesty-co.github.io/kompass-compute

@@ -119,8 +119,6 @@ telemetryManager:
 # or override them if the chart provides such options.
 ```
 
-The IAM roles and policies should be created beforehand, for example, using the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) with `enable_irsa = true`.
-
 ## Values
 
 | Key | Type | Default | Description |
