@@ -9,11 +9,11 @@ One chart deploys the components and the other deploys the CRDs. The charts are 
 -   [charts/kompass-compute](https://github.com/zesty-co/kompass-compute/tree/main/charts/kompass-compute): chart for the main Kompass Compute components
 -   [charts/kompass-compute-crd](https://github.com/zesty-co/kompass-compute/tree/main/charts/kompass-compute-crd): chart for the CRDs
 
-Regarding CRDs: Installing **charts/kompass-compute** will install the CRDs as-is. To update the CRDs, install both charts, and when you install the **charts/kompass-compute** chart, use the '--skip-crds' flag.
+Regarding CRDs: Installing **charts/kompass-compute** will install the CRDs as-is. To update the CRDs, install both charts, and when you install the **charts/kompass-compute** chart, use the `--skip-crds` flag.
 
 ## Usage
 
 For details about each chart, see their respective README files inside each folder:
 
--   [charts/kompass-compute-crd](https://github.com/zesty-co/kompass-compute/tree/main/charts/kompass-compute-crd)
 -   [charts/kompass-compute](https://github.com/zesty-co/kompass-compute/tree/main/charts/kompass-compute)
+-   [charts/kompass-compute-crd](https://github.com/zesty-co/kompass-compute/tree/main/charts/kompass-compute-crd)

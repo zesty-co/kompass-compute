@@ -50,7 +50,7 @@ cachePullMappings:
   # Add other registries as needed, e.g., ecr, k8s, quay
 ```
 
-1.  To enable downloading from ECR through S3, configure an S3 VPC endpoint in your cluster. Enable Kompass Compute to access it by adding the following to values.yaml:
+3.  To enable downloading from ECR through S3, configure an S3 VPC endpoint in your cluster. Enable Kompass Compute to access it by adding the following to values.yaml:
 
 ```yaml
 qubexConfig:
