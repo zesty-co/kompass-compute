@@ -4,7 +4,7 @@ This chart deploys the Kompass Compute components.
 
 ## Prerequisites
 
--   Kubernetes v1.19, or later
+-   Kubernetes v1.28, or later
 -   Helm v3.2.0, or later
 -   Kompass Insight agent installed in the cluster
 -   kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed

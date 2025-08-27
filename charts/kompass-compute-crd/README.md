@@ -4,7 +4,7 @@ This chart deploys the Kompass Compute CRD components.
 
 ## Prerequisites
 
--   Kubernetes v1.19, or later
+-   Kubernetes v1.28, or later
 -   Helm v3.2.0, or later
 
 ## Install the chart
