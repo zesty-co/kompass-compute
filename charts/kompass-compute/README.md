@@ -4,15 +4,15 @@ This chart deploys the Kompass Compute components.
 
 ## Prerequisites
 
-* Kubernetes 1.19+
-* Helm 3.2.0+
-* Kompass Insight Agent installed in the cluster
-* kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
-* Pod Identity enabled in the cluster, otherwise go to the [IRSA section](#using-iam-roles-for-service-accounts-irsa)
+-   Kubernetes v1.28, or later
+-   Helm v3.2.0, or later
+-   Kompass Insight agent installed in the cluster
+-   kompass-compute [terraform module](https://github.com/zesty-co/terraform-kompass-compute) installed
+-   Pod Identity enabled in the cluster (alternatively, see [Use IAM Roles for Service Accounts (IRSA)](#use-iam-roles-for-service-accounts-irsa))
 
-## Installing the Chart
+## Install the chart
 
-To install the chart with the release name `kompass-compute`:
+The following example shows how to install the chart with the release name, `kompass-compute`:
 
 ```bash
 helm repo add zesty-kompass-compute https://zesty-co.github.io/kompass-compute
@@ -20,19 +20,26 @@ helm repo update
 helm install kompass-compute zesty-kompass-compute/kompass-compute --namespace zesty-system
 ```
 
-> **Note**: To enable spot protection you need to provide the SQS queue URL in values.yaml.
+>   **Note**: To enable Spot protection, you must provide the SQS queue URL in **values.yaml**.
 
-&nbsp;
+## Advanced configuration
 
-## Advanced Configuration
+This section describes the following advanced configuration options:
 
-### Configuring ECR Pull-Through Cache
+-   [ECR pull through cache](#ecr-pull-through-cache)
+-   [Spot interruption monitoring](#spot-interruption-monitoring)
+-   [Use IAM Roles for Service Accounts (IRSA)](#use-iam-roles-for-service-accounts-irsa)
 
-Caching the images on all Hibernated nodes can increase network costs.
+### ECR pull through cache
 
-To reduce network costs, it's recommended to configure an ECR Pull-Through Cache and configure the nodes to pull images through it, thus only downloading each image from the internet once.
+Caching the images on all hibernated nodes can increase network costs.
 
-First create the ECR Pull-Through Cache rules for the desired container registries, and then configure Kompass Compute to use them by confuguring values.yaml as follows:
+To reduce network costs, it is recommended to configure an ECR pull through cache and configure the nodes to pull images through it, thus only downloading each image from the internet once.
+
+**To configure ECR pull through cache:**
+
+1.  Create the ECR pull through cache rules for the desired container registries.
+2.  Configure Kompass Compute to use those rules by configuring **values.yaml** as follows:
 
 ```yaml
 cachePullMappings:
@@ -43,8 +50,7 @@ cachePullMappings:
   # Add other registries as needed, e.g., ecr, k8s, quay
 ```
 
-Additionally, since downloading from ECR is performed though S3, you should have an S3 VPC endpoint configured in your cluster and Kompass Compute should be configured to access it.
-Add the following to values.yaml:
+3.  To enable downloading from ECR through S3, configure an S3 VPC endpoint in your cluster. Enable Kompass Compute to access it by adding the following to values.yaml:
 
 ```yaml
 qubexConfig:
@@ -53,11 +59,13 @@ qubexConfig:
       s3VpcEndpointID: "vpce-..."
 ```
 
-### Configure spot interruption monitoring
+### Spot interruption monitoring
 
-Kompass Compute monitors spot interruptions through an SQS queue that was created by the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
+Kompass Compute monitors Spot interruptions through an SQS queue that was created by the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
 
-To connect it to the Kubernetes components, add the following to values.yaml:
+**To configure Spot interruption monitoring:**
+
+-   To connect the queue to the Kubernetes components, add the following to values.yaml:
 
 ```yaml
 qubexConfig:
@@ -68,15 +76,15 @@ qubexConfig:
 
 These values are typically obtained from the output of the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute).
 
-### Using IAM Roles for Service Accounts (IRSA)
+### Use IAM Roles for Service Accounts (IRSA)
 
-It's recomended to use EKS Pod Identity instead of IRSA, but if you perfer IRSA, you can configure it as follows:
+It's recommended to use EKS Pod Identity. If you must use IRSA, you need to configure it.
 
-First make sure that you have created the necasary IAM roles and policies.
+**To configure IRSA:**
 
-These are created through the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) by specifying `enable_irsa = true` and `irsa_oidc_provider_arn=<OIDC_PROVIDER_ARN>`.
-
-Then make sure that all controllers are configured to use IRSA by adding the following to values.yaml:
+1.  Create the necessary IAM roles and policies. 
+    Use the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) by specifying `enable_irsa = true` and `irsa_oidc_provider_arn=<OIDC_PROVIDER_ARN>`.
+2.  Ensure that all controllers are configured to use IRSA by adding the following to values.yaml:
 
 ```yaml
 # Ensure serviceAccount.create is true for each component if the chart manages them,
@@ -110,8 +118,6 @@ telemetryManager:
 # (preferring IRSA), ensure no pod identity related labels/annotations are set by default,
 # or override them if the chart provides such options.
 ```
-
-The IAM roles and policies should be created beforehand, for example, using the [Kompass Compute Terraform module](https://github.com/zesty-co/terraform-kompass-compute) with `enable_irsa = true`.
 
 ## Values
 
