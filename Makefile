@@ -43,11 +43,8 @@ HELM_DOCS_IGNORE_REGEX := ".*\.readinessProbe\..*,.*\.startupProbe\..*,.*\.liven
 docs: ## Generate documentation from values.yaml using helm-docs for all charts
 	@echo "Generating documentation using helm-docs for all charts..."
 	@if command -v helm-docs >/dev/null 2>&1; then \
-		for chart in $(CHARTS); do \
-			echo "Generating docs for $$chart"; \
-			(cd $$chart && helm-docs --documentation-strict-mode --documentation-strict-ignore-absent-regex $(HELM_DOCS_IGNORE_REGEX)); \
-		done; \
-		echo "Documentation generated in README.md files"; \
+		echo "Generating docs for $$chart"; \
+		(cd charts/kompass-compute && helm-docs -t internal/README.md.gotmpl --documentation-strict-mode --documentation-strict-ignore-absent-regex $(HELM_DOCS_IGNORE_REGEX)); \
 	else \
 		echo "WARNING: helm-docs not found. Skipping documentation generation."; \
 	fi
