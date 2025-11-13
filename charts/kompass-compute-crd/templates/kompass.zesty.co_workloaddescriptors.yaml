@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.5
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: workloaddescriptors.kompass.zesty.co
 spec:
   group: kompass.zesty.co
@@ -49,6 +49,26 @@ spec:
             type: object
           spec:
             properties:
+              draining:
+                default: {}
+                description: The configuration for how to drain pods from the workload
+                properties:
+                  method:
+                    default: accelerated
+                    description: The method used for draining pods.
+                    enum:
+                    - accelerated
+                    - regular
+                    type: string
+                  threshold:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    default: 10%
+                    description: The percentage of pods in the workload that can be
+                      unavailable during the drain operation.
+                    x-kubernetes-int-or-string: true
+                type: object
               protection:
                 description: The configuration for how to protect the workload
                 properties:
@@ -74,6 +94,7 @@ spec:
                     - memory
                     type: object
                   spike:
+                    default: {}
                     description: Spike protection configuration
                     properties:
                       active:
@@ -97,14 +118,14 @@ spec:
                         anyOf:
                         - type: integer
                         - type: string
+                        default: 20%
                         description: |-
                           The percentage of pods in the workload that should be Unschedulable to trigger resumption of hibernated nodes.
                           The threshold is needed, to prevent unnecessary resumption of hibernated nodes.
                         x-kubernetes-int-or-string: true
-                    required:
-                    - active
                     type: object
                   spot:
+                    default: {}
                     description: Spot protection configuration
                     properties:
                       active:
@@ -121,8 +142,6 @@ spec:
                         - default
                         - conservative
                         type: string
-                    required:
-                    - active
                     type: object
                 required:
                 - resources
@@ -151,6 +170,22 @@ spec:
             type: object
           status:
             properties:
+              draining:
+                properties:
+                  lastUpdatedAt:
+                    description: The last time the status for Draining configuration
+                      was updated.
+                    format: date-time
+                    type: string
+                  maxUnavailableDuringDrain:
+                    description: Maximum number of pods that can be unavailable during
+                      the drain operation.
+                    format: int32
+                    type: integer
+                required:
+                - lastUpdatedAt
+                - maxUnavailableDuringDrain
+                type: object
               hpa:
                 properties:
                   lastUpdatedAt:
@@ -163,8 +198,14 @@ spec:
                       with.
                     format: int32
                     type: integer
+                  minUnavailableForResumption:
+                    description: Minimum number of pods that should not be available
+                      to trigger
+                    format: int32
+                    type: integer
                 required:
                 - lastUpdatedAt
+                - minUnavailableForResumption
                 type: object
               protection:
                 properties:
@@ -217,20 +258,6 @@ spec:
                     - Active
                     - Pending
                     - Failed
-                    type: string
-                required:
-                - lastUpdatedAt
-                type: object
-              spotCoverageStatus:
-                properties:
-                  actualCoveragePercentage:
-                    format: int32
-                    type: integer
-                  desiredCoveragePercentage:
-                    format: int32
-                    type: integer
-                  lastUpdatedAt:
-                    format: date-time
                     type: string
                 required:
                 - lastUpdatedAt
