@@ -3,7 +3,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.18.0
+    controller-gen.kubebuilder.io/version: v0.19.0
   name: workloaddescriptors.kompass.zesty.co
 spec:
   group: kompass.zesty.co
@@ -67,6 +67,7 @@ spec:
                     default: 10%
                     description: The percentage of pods in the workload that can be
                       unavailable during the drain operation.
+                    pattern: ^(100|[0-9]{1,2})%?$
                     x-kubernetes-int-or-string: true
                 type: object
               protection:
@@ -122,6 +123,7 @@ spec:
                         description: |-
                           The percentage of pods in the workload that should be Unschedulable to trigger resumption of hibernated nodes.
                           The threshold is needed, to prevent unnecessary resumption of hibernated nodes.
+                        pattern: ^(100|[0-9]{1,2})%?$
                         x-kubernetes-int-or-string: true
                     type: object
                   spot:
@@ -198,14 +200,8 @@ spec:
                       with.
                     format: int32
                     type: integer
-                  minUnavailableForResumption:
-                    description: Minimum number of pods that should not be available
-                      to trigger
-                    format: int32
-                    type: integer
                 required:
                 - lastUpdatedAt
-                - minUnavailableForResumption
                 type: object
               protection:
                 properties:
@@ -216,6 +212,11 @@ spec:
                   message:
                     description: Message
                     type: string
+                  minUnavailableForResumption:
+                    description: Minimum number of pods that should not be available
+                      to trigger
+                    format: int32
+                    type: integer
                   protectingQScalers:
                     description: How to distribute the resources across all QScalers
                     items:
@@ -261,6 +262,7 @@ spec:
                     type: string
                 required:
                 - lastUpdatedAt
+                - minUnavailableForResumption
                 type: object
             type: object
         required:
