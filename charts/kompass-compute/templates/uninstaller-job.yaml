@@ -57,6 +57,8 @@ spec:
                   fieldPath: metadata.namespace
             - name: DEVELOPMENT_MODE
               value: {{ default .Values.developmentMode .Values.uninstaller.developmentMode | quote }}
+            - name: KOMPASS_COMPUTE_CHART_VERSION
+              value: {{ .Chart.Version }}
             {{- with .Values.uninstaller.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
