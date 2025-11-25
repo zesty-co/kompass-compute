@@ -68,6 +68,8 @@ spec:
               value: {{ include "kompass-compute.otel.metricsExporter" . | quote }}
             - name: DEVELOPMENT_MODE
               value: {{ default .Values.developmentMode .Values.otel.developmentMode | quote }}
+            - name: KOMPASS_COMPUTE_CHART_VERSION
+              value: {{ .Chart.Version }}
             {{- with .Values.otel.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
