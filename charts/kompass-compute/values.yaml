@@ -1123,8 +1123,8 @@ qubexConfig:
       # qubexConfig.infraConfig.aws.enableM7FlexInstances -- Enable m7i-flex instances
       # enableM7FlexInstances: true
 
-      # qubexConfig.infraConfig.aws.baseDiskSize -- The disk size used by Qubex VMs will be (BaseDiskSize + <instance memory size>)
-      # baseDiskSize: ...
+    # qubexConfig.infraConfig.baseDiskSize -- The disk size used by Qubex VMs will be (BaseDiskSize + <instance memory size>)
+    # baseDiskSize: ...
 
   # qubexConfig.defaultWorkloadProtectionThreshold -- The default workload protection threshold
   # defaultWorkloadProtectionThreshold: ...
@@ -1168,6 +1168,12 @@ qubexConfig:
 
     # qubexConfig.drainingConfig.replacementPodRetryInterval -- The time after Qubex will create another replacement pod for the same workload
     # replacementPodRetryInterval: ...
+
+    # qubexConfig.drainingConfig.replacementPodRetryLimit -- The time after Qubex will evict a pod from the node
+    # evictionRetryInterval: ...
+
+    # qubexConfig.drainingConfig.replacementPodRetryLimit -- The percentage of pods in the workload that can be unavailable during the drain operation.
+    # defaultEvictionThreshold: ...
 
   # qubexConfig.disturbanceConfig -- Configuration for disturbance handling
   disturbanceConfig: {}
@@ -1236,6 +1242,12 @@ qubexConfig:
   zestyConfig: {}
     # qubexConfig.zestyConfig.uploadInterval -- Upload interval
     # uploadInterval: ...
+
+  # qubexConfig.customUserDataStart -- Additional code that will run in the beginning of a QNode startup.
+  # customUserDataStart: ...
+
+  # Additional code that will run in the end of a QNode startup.
+  # customUserDataEnd: ...
 
 # cachePullMappings -- Configuration for mapping image registries to proxies/caches
 cachePullMappings: {}
