@@ -301,6 +301,27 @@ telemetryManager:
 | qubexConfig.infraConfig.aws | object | `{}` | AWS specific configuration |
 | qubexConfig.spotOceanConfig | object | `{}` | Spot.io Ocean integration configuration |
 | qubexConfig.zestyConfig | object | `{}` | Zesty configuration |
+| secretValidator | object | `{"affinity":{},"enabled":true,"image":{"pullPolicy":"IfNotPresent","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/docker-hub/bitnami/kubectl","tag":"latest"},"nodeSelector":{},"podAnnotations":{},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"rbac":{"create":true},"resources":{"limits":{"cpu":"100m","memory":"64Mi"},"requests":{"cpu":"50m","memory":"32Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"tolerations":[]}` | Secret Validator pre-install hook configuration This component validates that the required Kompass Insight secret exists before installation. |
+| secretValidator.affinity | object | `{}` | Affinity rules for scheduling Secret Validator Pod |
+| secretValidator.enabled | bool | `true` | If true, the pre-install secret validation hook is created |
+| secretValidator.image | object | `{"pullPolicy":"IfNotPresent","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/docker-hub/bitnami/kubectl","tag":"latest"}` | Image configuration for the Secret Validator Job |
+| secretValidator.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the Secret Validator container |
+| secretValidator.image.repository | string | `"672188301118.dkr.ecr.eu-west-1.amazonaws.com/docker-hub/bitnami/kubectl"` | Image repository for the Secret Validator container |
+| secretValidator.image.tag | string | `"latest"` | Specific image tag for the Secret Validator |
+| secretValidator.nodeSelector | object | `{}` | Node selector for scheduling Secret Validator Pod |
+| secretValidator.podAnnotations | object | `{}` | Annotations to add to the Secret Validator Pod |
+| secretValidator.podLabels | object | `{}` | Additional labels to add to the Secret Validator Pod |
+| secretValidator.podSecurityContext | object | `{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context for Secret Validator Pod |
+| secretValidator.rbac | object | `{"create":true}` | RBAC configuration for the Secret Validator component |
+| secretValidator.rbac.create | bool | `true` | If true, creates RBAC resources for the Secret Validator Job |
+| secretValidator.resources | object | `{"limits":{"cpu":"100m","memory":"64Mi"},"requests":{"cpu":"50m","memory":"32Mi"}}` | Resource requests and limits for the Secret Validator container |
+| secretValidator.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true}` | Security context for Secret Validator container |
+| secretValidator.serviceAccount | object | `{"annotations":{},"automount":true,"create":true,"name":""}` | ServiceAccount configuration for the Secret Validator component |
+| secretValidator.serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
+| secretValidator.serviceAccount.automount | bool | `true` | If true, automounts the Kubernetes API credentials for the ServiceAccount |
+| secretValidator.serviceAccount.create | bool | `true` | If true, creates a ServiceAccount for the Secret Validator |
+| secretValidator.serviceAccount.name | string | `""` | The name of the ServiceAccount to use |
+| secretValidator.tolerations | list | `[]` | Tolerations for scheduling Secret Validator Pod |
 | snapshooter | object | `{"affinity":{},"developmentMode":null,"enabled":true,"extraArgs":[],"extraEnv":[],"extraVolumeMounts":[],"extraVolumes":[],"image":{"pullPolicy":"Always","repository":"672188301118.dkr.ecr.eu-west-1.amazonaws.com/zesty-k8s/kompass-compute/snapshooter","tag":""},"livenessProbe":{"httpGet":{"path":"/healthz","port":"probes"},"initialDelaySeconds":15,"periodSeconds":20,"timeoutSeconds":5},"logLevel":null,"logRemote":null,"nodeSelector":{},"podAnnotations":{},"podDisruptionBudget":{"enabled":false},"podLabels":{},"podSecurityContext":{"fsGroup":1000,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000,"seccompProfile":{"type":"RuntimeDefault"}},"ports":{"probes":{"name":"probes","port":8081}},"rbac":{"create":true},"readinessProbe":{"httpGet":{"path":"/readyz","port":"probes"},"initialDelaySeconds":5,"periodSeconds":10,"timeoutSeconds":5},"replicaCount":1,"resources":{"limits":{"cpu":"300m","memory":"512Mi"},"requests":{"cpu":"100m","memory":"128Mi"}},"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true},"serviceAccount":{"annotations":{},"automount":true,"create":true,"name":""},"startupProbe":{"failureThreshold":50,"httpGet":{"path":"/healthz","port":"probes"},"periodSeconds":10,"timeoutSeconds":5},"terminationGracePeriodSeconds":60,"tolerations":[],"traceRemote":null,"useDefaultAffinity":true}` | Snapshooter component configuration |
 | snapshooter.affinity | object | `{}` | Affinity rules for scheduling Snapshooter pods. Overrides default affinity if set |
 | snapshooter.developmentMode | string | `nil` | Component-specific override for global development mode |
