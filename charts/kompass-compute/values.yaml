@@ -1068,6 +1068,76 @@ uninstaller:
   # uninstaller.affinity -- Affinity rules for scheduling Uninstaller Pod
   affinity: {}
 
+# secretValidator -- Secret Validator pre-install hook configuration
+# This component validates that the required Kompass Insight secret exists before installation.
+secretValidator:
+  # secretValidator.enabled -- If true, the pre-install secret validation hook is created
+  enabled: true
+
+  # secretValidator.image -- Image configuration for the Secret Validator Job
+  image:
+    # secretValidator.image.repository -- Image repository for the Secret Validator container
+    repository: 672188301118.dkr.ecr.eu-west-1.amazonaws.com/docker-hub/bitnami/kubectl
+    # secretValidator.image.pullPolicy -- Image pull policy for the Secret Validator container
+    pullPolicy: IfNotPresent
+    # secretValidator.image.tag -- Specific image tag for the Secret Validator
+    tag: "latest"
+
+  # secretValidator.rbac -- RBAC configuration for the Secret Validator component
+  rbac:
+    # secretValidator.rbac.create -- If true, creates RBAC resources for the Secret Validator Job
+    create: true
+
+  # secretValidator.serviceAccount -- ServiceAccount configuration for the Secret Validator component
+  serviceAccount:
+    # secretValidator.serviceAccount.create -- If true, creates a ServiceAccount for the Secret Validator
+    create: true
+    # secretValidator.serviceAccount.automount -- If true, automounts the Kubernetes API credentials for the ServiceAccount
+    automount: true
+    # secretValidator.serviceAccount.annotations -- Annotations to add to the ServiceAccount
+    annotations: {}
+    # secretValidator.serviceAccount.name -- The name of the ServiceAccount to use
+    name: ""
+
+  # secretValidator.podAnnotations -- Annotations to add to the Secret Validator Pod
+  podAnnotations: {}
+  # secretValidator.podLabels -- Additional labels to add to the Secret Validator Pod
+  podLabels: {}
+
+  # secretValidator.podSecurityContext -- Security context for Secret Validator Pod
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+  # secretValidator.securityContext -- Security context for Secret Validator container
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  # secretValidator.resources -- Resource requests and limits for the Secret Validator container
+  resources:
+    limits:
+      cpu: 100m
+      memory: 64Mi
+    requests:
+      cpu: 50m
+      memory: 32Mi
+
+  # secretValidator.nodeSelector -- Node selector for scheduling Secret Validator Pod
+  nodeSelector: {}
+  # secretValidator.tolerations -- Tolerations for scheduling Secret Validator Pod
+  tolerations: []
+
+  # secretValidator.affinity -- Affinity rules for scheduling Secret Validator Pod
+  affinity: {}
+
 # qnode -- QNode specific configuration
 qnode:
   # qnode.enabled -- If true, enables QNode specific features or deployments.

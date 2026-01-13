@@ -817,6 +817,73 @@ affinity:
 
 
 {{/*
+Create the short name of the Secret Validator.
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.shortName" -}}
+secret-validator
+{{- end }}
+
+{{/*
+Create the name of the Secret Validator.
+Some Kubernetes name fields are limited to 63 chars (by the DNS naming spec).
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.name" -}}
+{{ printf "%s-%s" (include "kompass-compute.fullname" .) (include "kompass-compute.secretValidator.shortName" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Creates the image of the Secret Validator.
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.image" -}}
+{{ .Values.secretValidator.image.repository }}:{{ .Values.secretValidator.image.tag }}
+{{- end }}
+
+{{/*
+Secret Validator labels
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.labels" -}}
+{{ include "kompass-compute.secretValidator.selectorLabels" . }}
+{{ include "kompass-compute.labels" . }}
+{{- end }}
+
+{{/*
+Secret Validator selector labels
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kompass-compute.secretValidator.shortName" . }}
+app.kubernetes.io/component: pre-install-hook
+{{ include "kompass-compute.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use for Secret Validator.
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.serviceAccountName" -}}
+{{- if .Values.secretValidator.serviceAccount.create }}
+{{- default (include "kompass-compute.secretValidator.name" .) .Values.secretValidator.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.secretValidator.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Creates default affinity rules for Secret Validator.
+Component: SecretValidator
+*/}}
+{{- define "kompass-compute.secretValidator.affinity" -}}
+{{- if .Values.secretValidator.affinity -}}
+affinity:
+  {{- toYaml .Values.secretValidator.affinity | nindent 2 }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Create the name of the QNode.
 Some Kubernetes name fields are limited to 63 chars (by the DNS naming spec).
 Component: QNode
