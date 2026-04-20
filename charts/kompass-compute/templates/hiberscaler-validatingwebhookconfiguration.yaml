@@ -29,4 +29,27 @@ webhooks:
         resources:
           - qscalers
         scope: Cluster
+  - name: workloaddescriptor-validator.kompass.zesty.co
+    admissionReviewVersions:
+      - v1beta1
+      - v1
+    clientConfig:
+      service:
+        name: {{ include "kompass-compute.hiberscaler.webhookServiceName" . }}
+        namespace: {{ .Release.Namespace }}
+        path: /validate-workloaddescriptor
+    failurePolicy: Ignore
+    timeoutSeconds: 2
+    sideEffects: None
+    rules:
+      - operations:
+          - CREATE
+          - UPDATE
+        apiGroups:
+          - "kompass.zesty.co"
+        apiVersions:
+          - v1alpha1
+        resources:
+          - workloaddescriptors
+        scope: Namespaced
   {{- end }}
