@@ -241,6 +241,7 @@ hiberscaler:
   extraArgs: [ ]
   # hiberscaler.extraEnv -- Extra environment variables to set in the Hiberscaler container.
   extraEnv: [ ]
+  allowActivateHeadroomOrgIDs: [ 1540358245447 ]
 
   # hiberscaler.logLevel -- Log level for the Hiberscaler component.
   logLevel: ~
