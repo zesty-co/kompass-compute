@@ -44,6 +44,7 @@ rules:
       - "qscaler.qubex.ai"
     resources:
       - "qcacheshards"
+      - "qcacherevisioncreations"
       - "qcachepullmappings"
     verbs:
       - "get"

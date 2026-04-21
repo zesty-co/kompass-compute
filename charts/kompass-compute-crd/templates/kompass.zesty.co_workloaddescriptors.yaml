@@ -18,6 +18,9 @@ spec:
     - jsonPath: .status.protection.state
       name: State
       type: string
+    - jsonPath: .status.protection.message
+      name: Message
+      type: string
     - jsonPath: .status.protection.lastUpdatedAt
       name: Last_Updated
       type: date
