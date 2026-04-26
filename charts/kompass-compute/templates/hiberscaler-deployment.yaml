@@ -64,8 +64,6 @@ spec:
               value: {{ default .Values.developmentMode .Values.hiberscaler.developmentMode | quote }}
             - name: KOMPASS_COMPUTE_CHART_VERSION
               value: {{ .Chart.Version }}
-            - name: ALLOW_ACTIVATE_HEADROOM_ORG_IDS
-              value: {{ .Values.hiberscaler.allowActivateHeadroomOrgIDs | toJson | quote }}
             {{- with .Values.hiberscaler.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
