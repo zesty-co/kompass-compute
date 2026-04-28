@@ -25,4 +25,12 @@ rules:
       - "watch"
       - "create"
       - "patch"
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
 {{- end }}
