@@ -120,25 +120,51 @@ spec:
               imageSizeCalculations:
                 description: Image size calculations results
                 items:
+                  description: |-
+                    ImageSizeCalculation records the result of calculating the size of a container image for a
+                    specific architecture. It captures the outcome status, a human-readable reason on failure, the
+                    content hash, total compressed size in bytes, and a per-layer size breakdown used for cache planning.
                   properties:
                     architecture:
+                      description: Architecture is the CPU architecture (e.g. AMD64,
+                        ARM64) for which the image was inspected.
                       enum:
                       - AMD64
                       - ARM64
                       type: string
+                    details:
+                      default: ""
+                      description: Details provides additional details when Status
+                        is Failed.
+                      type: string
                     hash:
+                      description: Hash is the content-addressable digest of the image
+                        manifest, used to detect image updates.
                       type: string
                     image:
+                      description: Image is the fully-qualified container image reference
+                        that was evaluated.
                       type: string
                     layersHash:
                       additionalProperties:
                         format: int64
                         type: integer
+                      description: LayersHash maps each layer digest to its uncompressed
+                        size in bytes, used for fine-grained cache planning.
                       type: object
+                    reason:
+                      default: ""
+                      description: Reason provides a human-readable explanation when
+                        Status is Failed.
+                      type: string
                     size:
+                      description: Size is the total uncompressed size of the image
+                        in bytes across all layers.
                       format: int64
                       type: integer
                     status:
+                      description: Status reflects whether the size calculation is
+                        still pending, succeeded, or failed.
                       enum:
                       - Pending
                       - Failed
