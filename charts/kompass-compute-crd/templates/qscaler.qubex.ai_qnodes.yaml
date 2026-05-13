@@ -371,6 +371,62 @@ spec:
                 - Draining
                 - Terminating
                 type: string
+              phaseHistory:
+                description: History of phase transitions, capped at QNodePhaseHistoryMaxSize
+                items:
+                  properties:
+                    from:
+                      description: Previous phase, nil when the QNode had no phase
+                        set yet
+                      enum:
+                      - Initializing
+                      - OnHold
+                      - Baking
+                      - RequestingHibernation
+                      - Hibernating
+                      - Hibernated
+                      - RequestingResume
+                      - Resuming
+                      - Running
+                      - RequiresUpdate
+                      - RequestingCacheUpdate
+                      - UpdatingCache
+                      - Draining
+                      - Terminating
+                      type: string
+                    message:
+                      description: Human-readable details about the transition
+                      type: string
+                    reason:
+                      description: Short machine-readable reason for the transition
+                      type: string
+                    timestamp:
+                      description: Time at which the transition occurred
+                      format: date-time
+                      type: string
+                    to:
+                      description: New phase
+                      enum:
+                      - Initializing
+                      - OnHold
+                      - Baking
+                      - RequestingHibernation
+                      - Hibernating
+                      - Hibernated
+                      - RequestingResume
+                      - Resuming
+                      - Running
+                      - RequiresUpdate
+                      - RequestingCacheUpdate
+                      - UpdatingCache
+                      - Draining
+                      - Terminating
+                      type: string
+                  required:
+                  - timestamp
+                  - to
+                  type: object
+                type: array
               qCacheStatus:
                 description: QCache status
                 properties:
