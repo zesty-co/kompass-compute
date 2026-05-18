@@ -304,6 +304,16 @@ entries:
   kompass-compute-crd:
   - apiVersion: v2
     appVersion: 0.12.6
+    created: "2026-05-18T05:18:39.898443751Z"
+    description: Zesty Kompass Compute CRD for Kubernetes
+    digest: a1fd36eba7d50b6ddf52acd532509bf1febea6fdeafec332792efa0bbf1a9fc8
+    name: kompass-compute-crd
+    type: application
+    urls:
+    - https://github.com/zesty-co/kompass-compute/releases/download/kompass-compute-crd-0.1.12/kompass-compute-crd-0.1.12.tgz
+    version: 0.1.12
+  - apiVersion: v2
+    appVersion: 0.12.6
     created: "2026-04-27T10:49:39.998856884Z"
     description: Zesty Kompass Compute CRD for Kubernetes
     digest: ec4db66b1c58b5ef291b21d68c503c86cb30190e3b44cff4727fba8fb62d7973
@@ -412,4 +422,4 @@ entries:
     urls:
     - https://github.com/zesty-co/kompass-compute/releases/download/kompass-compute-crd-0.1.0/kompass-compute-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-07T10:52:25.648199513Z"
+generated: "2026-05-18T05:18:39.89854931Z"
