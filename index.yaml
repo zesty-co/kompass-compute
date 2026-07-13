@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   kompass-compute:
   - apiVersion: v2
+    appVersion: 0.13.10
+    created: "2026-07-13T09:53:58.58397779Z"
+    description: Zesty Kompass Compute for Kubernetes
+    digest: 1b0d6a6906a8d36a70535d0a1b714f5a49609038d9955ff4812a75cb5f20678f
+    name: kompass-compute
+    type: application
+    urls:
+    - https://github.com/zesty-co/kompass-compute/releases/download/kompass-compute-0.1.31/kompass-compute-0.1.31.tgz
+    version: 0.1.31
+  - apiVersion: v2
     appVersion: 0.13.9
     created: "2026-05-18T12:56:56.040333049Z"
     description: Zesty Kompass Compute for Kubernetes
@@ -432,4 +442,4 @@ entries:
     urls:
     - https://github.com/zesty-co/kompass-compute/releases/download/kompass-compute-crd-0.1.0/kompass-compute-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-18T12:56:56.04069707Z"
+generated: "2026-07-13T09:53:58.584340853Z"
